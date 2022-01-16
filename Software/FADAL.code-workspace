@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"name": "ESP32 on FADAL Control",
+			"path": "ESP32 on FADAL Control"
+		},
+		{
+			"name": "ESP32 on FADAL Motherboard",
+			"path": "ESP32 on FADAL Motherboard"
+		},
+		{
+			"path": "UCCNC Macros"
+		}
+	],
+	"settings": {}
+}
