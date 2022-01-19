@@ -1,0 +1,61 @@
+int SpindleSpeed = AS3.Getfield(870); // Actspindlespeed
+boul LowGearProximitySwitch = AS3.GetLED(10); // Port 1 pin 10
+boul HighGearProximitySwitch = AS3.GetLED(11); // Port 1 pin 11
+int AirPressure = AS3.Getfield(911); // Analog out 1 (Air pressure)
+int AirPressureMinimum = 30000;
+
+if(AirPressure < AirPressureMinimum){
+    MessageBox.Show("Air pressure is to low to maintain machine minimum requirments"); // Send Message "Air pressure to low"
+    exec.Callbutton(130); // Stop the machine
+    exec.Callbutton(512); // Trigger Reset
+    Exit;
+}
+
+If(SpindleSpeed < 2500){
+    exec.Code("M215 P1"); // M215 P1
+    exec.Setoutpin(2, 3); // Engage Relay piston low gear
+    exec.Clroutpin(2, 4); // Release Relay piston high gear
+	int i = 0;
+	while(! LowGearProximitySwitch){
+		LowGearProximitySwitch = AS3.GetLED(10);
+		delay(20);
+		i ++;
+		if(i > 100){
+			MessageBox.Show("Low speed belt tensioner switch not triggered. Please check belt tensioners, solénoïde valve number ????");
+			exec.Callbutton(130); // Stop the machine
+    		exec.Callbutton(512); // Trigger Reset
+    		Exit;
+        }
+	}
+    if(LowGearProximitySwitch && !HighGearProximitySwitch){ // Test low gear proximity switch
+        // Start spindle
+    }
+}
+
+if(SpindleSpeed >= 2500){
+    exec.Code("M215 P2"); // M215 P1
+    exec.Setoutpin(2, 4); // Engage Relay piston high gear
+    exec.Clroutpin(2, 3); // Release Relay piston low gear
+	int i = 0;
+	while(! LowGearProximitySwitch){
+		LowGearProximitySwitch = AS3.GetLED(11);
+		delay(20);
+		i ++;
+		if(i > 100){
+			MessageBox.Show("High speed belt tensioner switch not triggered. Please check belt tensioners, solénoïde valve number ????");
+			exec.Callbutton(130); // Stop the machine
+    		exec.Callbutton(512); // Trigger Reset
+    		Exit;
+        }
+	}
+    if(LowGearProximitySwitch && !HighGearProximitySwitch){ // Test low gear proximity switch
+        // Start spindle
+    }
+}
+
+if(SpindleSpeed > 10000){
+    MessageBox.Show("Commanded spindle speed exceeds machine capabilities"); // Send Message "Speed not supported"
+	exec.Callbutton(130); // Stop the machine
+    exec.Callbutton(512); // Trigger Reset
+    Exit;
+}

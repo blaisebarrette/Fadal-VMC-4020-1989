@@ -1,0 +1,1142 @@
+<html>
+
+<head>
+<meta name="GENERATOR" content="Microsoft FrontPage 5.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1250">
+<title>This document describes the UCCNC software macro function calls 
+capability</title>
+<style>
+<!--
+		P { margin-bottom: 0.21cm }
+-->
+</style>
+</head>
+
+<body>
+
+<p STYLE="margin-top: 0; margin-bottom: 0cm" align="center">&nbsp;</p>
+<p STYLE="margin-top: 0; margin-bottom: 0cm" align="center">
+<font FACE="Arial" COLOR="#000000" size="4">This document describes the <b>UCCNC software</b> 
+macro function calls capability.</font></p>
+<p STYLE="margin-top: 0; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">The UCCNC software can have 
+different profiles. Each profile can have different machine setup/settings and 
+therefor different macros. </font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">The macro files are located in the 
+installation folder of the UCCNC software /Profile/</font><font FACE="Arial" COLOR="#0000ff">Macro_name 
+of profile , </font><font FACE="Arial" COLOR="#000000">where the „name 
+of profile” is the profile name the software is loaded with.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">The macros are plain text files with 
+a .txt extension and with the file names start with an „M” and after the number 
+of the macro. For example M3.txt.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">The user can make and edit new 
+macros simply by creating a new macro file and adding it to the macro folder of 
+the software. </font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">The macros as they are plain text 
+files are editable with the built in notepad.exe in Windows.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">By default t</font><font FACE="Arial" COLOR="#000000">he macros' programming language is 
+C# (C-sharp). The language is not described in this documentation, but it is 
+very similar to C language and for those who are yet not familiar with C# 
+programming we recommend to study the following Wiki page: </font>
+<font face="Arial">
+<a HREF="http://en.wikipedia.org/wiki/C_Sharp_syntax" TARGET="_blank" style="so-language: zxx">
+http://en.wikipedia.org/wiki/C_Sharp_syntax</a></font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">There is an option to change any macros or macroloops from C# 
+language to VB (VisualBasic) language compilation with writting the #VB 
+directive into the very first line of the macro.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">If the first line of the macro code contains the #VB 
+directive then the software uses the VisualBasic compiler to compile the macro 
+instead of the C# compiler.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">When the Visual Badic language is selected in a macro then 
+the whole language have to be written in VB language following the VB syntax.
+</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">The UCCNC specific functions are the same for the C# and the 
+VB compilation, but this manual describes all functions in C# syntax only.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">The macros are compiled and executed 
+in runtime, so they can be changed any time using a text editor like notepad.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">In case the macro contains a syntax 
+error and cannot be compiled the UCCNC software will show a script error notice 
+in the status box.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Also it is possible to create a 
+runtime error, for example with dividing by zero in the macro code, in this case 
+the UCCNC software will also show an error notice in the status box.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">We recommend that when writting 
+macros first test them without the machine tool connected for safety reasons.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">All macros are compiled into the 
+Macro class. The Macro class has visibility to the following Namespaces and 
+objects:</font></p>
+<ol>
+  <li>
+  <p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+  <font face="Arial">&quot;exec&quot; is the executer</font><font FACE="Arial" COLOR="#000000">, this is the object in the UCCNC software which makes all motion execution, I/O 
+  manipulations etc.</font></li>
+  <li>
+  <p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+  <font face="Arial">&quot;AS3&quot; is the main screen, this is the object on the screen 
+  where all fields, buttons, LEDs are placed, the value of these can be read 
+  from the AS3 object.</font></li>
+  <li>
+  <p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+  <font face="Arial">&quot;AS3jog&quot; is the jog panel object on the screen, all fields, 
+  buttons, LEDs values on the jogpanel can be read from the AS3jog object.</font></li>
+  <li>
+  <p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+  <font FACE="Arial" COLOR="#000000">The  </font><font face="Arial">System, 
+  System.Windows.Forms, System.Drawing, System.Threading, 
+  System.Collections.Generic namespaces.</font></li>
+</ol>
+  <p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+  <font face="Arial">The macro text typed into the macro file is inside a 
+  function of a class and therefor defining other functions and global variables 
+  directly inside the macro is not possible.</font><p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+  <font face="Arial">Defining global variables and functions is possible only at 
+  the end of the macro text file with writting the #Events text into the macro, 
+  this text will let the UCCNC know that the remaining text of the macro has to 
+  be compiled outside of the function, but still inside the macro class.</font><p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+  <font face="Arial">The following example shows a simple macro which creates a 
+  Windows Form and adding a button to it and assigning an event handler to the 
+  button's click event.</font><p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+  <font face="Arial">The example also declares a function which is then called 
+  from inside the macro.</font><p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+  &nbsp;<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+  <font face="Arial" color="#800000">Button MyButton = new Button();<br>
+  MyButton.Size = new System.Drawing.Size(80, 40);<br>
+  MyButton.Location = new System.Drawing.Point(110, 130);<br>
+  MyButton.Text = &quot;Press me&quot;;<br>
+  MyButton.Click += new EventHandler(MyButton_Click);<br>
+  <br>
+  MyForm = new Form();<br>
+  MyForm.Size = new System.Drawing.Size(300, 300);<br>
+  MyForm.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;<br>
+  MyForm.Controls.Add(MyButton);<br>
+  MyForm.ShowDialog();<br>
+  <br>
+  MyFunction();<br>
+  <br>
+  #Events<br>
+  <br>
+  Form MyForm; //This is a global variable, a Windows Form<br>
+  <br>
+  void MyButton_Click(object sender, EventArgs e) <br>
+  {<br>
+&nbsp; MessageBox.Show(&quot;Mybutton was clicked!&quot;);<br>
+&nbsp; MyForm.Close();<br>
+  }<br>
+  <br>
+  void MyFunction()<br>
+  {<br>
+&nbsp; exec.Code(&quot;G0 X10&quot;);<br>
+  }</font><p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+  &nbsp;<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+  &nbsp;<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">1. The following list contains the 
+Executer object's functions which are callable from any macros. </font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">bool</font><font FACE="Arial" COLOR="#000000"> 
+IsMoving(</font><font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000">)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: The function returns 
+true if the software is executing a motion or a function. It returns false if 
+the software is in idle.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: while(exec.IsMoving()){}</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">bool</font><font FACE="Arial" COLOR="#000000"> 
+IsMovingTHC(</font><font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000">)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: The function </font>
+<font face="Arial">is the same as the IsMoving except that this function checks 
+the Idle bit only and does not checks the motion buffer count. This function can 
+be used for example to detect when the motion stopped when the THC control is 
+enabled and because the controller is waiting for the ArcOK signal to go on. In 
+this situation the software may still fill the motion buffer if there are more 
+motion commands in the g-code buffer, but the idle bit will be inactive and 
+because this function depends on the idle bit only, it will work in this 
+scenario.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: while(exec.IsMovingTHC()){}</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">double</font><font FACE="Arial" COLOR="#000000"> 
+Get[XYZABC]machpos(</font><font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000">)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: The function returns 
+the actual machine position of an axis, this is the abosulte position excluding 
+any offsets.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: <font COLOR="#0000ff">
+double</font> Xmachposvariable = exec.GetXmachpos();</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Notes: [XYZABC] means a character of 
+X, Y, Z, A, B or C</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">double</font><font FACE="Arial" COLOR="#000000"> 
+Get[XYZABC]pos(</font><font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000">)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: The function returns 
+the actual position of an axis including the selected offset and the tool offset.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: <font COLOR="#0000ff">
+double</font> Xposvariable = exec.GetXpos();</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Notes: [XYZABC] means a character of 
+X, Y, Z, A, B or C</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">double</font><font FACE="Arial" COLOR="#000000"> 
+Get[XYZABC]scale(</font><font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000">)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: The function returns the actual 
+G51 scale value of an axis.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: <font COLOR="#0000ff">
+double</font> Xposvariable = exec.GetXscale();</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Notes: [XYZABC] means a character of 
+X, Y, Z, A, B or C</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000"> 
+StopWithDeccel(</font><font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000">)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: The function stops all 
+axis using the set decceleration profile.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: exec.StopWithDeccel();</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000"> 
+Stop(</font><font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000">)
+</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: The function causing an 
+instant stop on all axis.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: exec.Stop();</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000"> 
+Wait(</font><font COLOR="#0000ff" face="Arial">int </font><font FACE="Arial" COLOR="#000000">milliseconds)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: The function causing 
+the loop to stop for the set amount of time in milliseconds.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: exec.Wait(1000);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000"> 
+Setofflinemode(</font><font FACE="Arial" COLOR="#0000ff">bool</font><font FACE="Arial" COLOR="#000000"> 
+setoffline) </font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: The functions sets the 
+machine to offline mode or to online mode. In offline mode the outputs of the 
+UC100 gets disconnected from the pins, so the machine can't move, however the 
+functions like movements seems like executing.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: exec.Setofflinemode(true);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">int</font><font FACE="Arial" COLOR="#000000"> 
+Getcurrenttool(</font><font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000">)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: The function returns 
+the actually selected tool number. It returns zero if no tool was yet selected.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: int Currenttoolvariable = 
+exec.Getcurrenttool();</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function:</font><font FACE="Arial" COLOR="#0000ff"> 
+void</font><font FACE="Arial" COLOR="#000000"> Setcurrenttool(</font><font FACE="Arial" COLOR="#0000ff">int</font><font FACE="Arial" COLOR="#000000"> 
+toolnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function sets the 
+selected tool number in the UCCNC software. Useful when using automatic tool 
+changer. We recommend to set the new tool number at the end of the toolchange 
+macro.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: exec.Setcurrenttool(2);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">int</font><font FACE="Arial" COLOR="#000000"> 
+Getnewtool(</font><font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000">)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function reads the 
+tool number next to the M6 code, forexample if a code M6 T2 was executed then 
+this function returns the number 2.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: <font COLOR="#0000ff">int</font> 
+newtoolnumber = exec.Getnewtool();</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font COLOR="#000000" FACE="Arial">Function: <font COLOR="#0000ff">bool</font></font><font FACE="Arial" COLOR="#000000"><font SIZE="2" FACE="Arial" COLOR="#000000"> </font></font>
+<font face="Arial" color="#000000">Ismacrostopped(void)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function checks if 
+a stop was pressed by the user on the UCCNC software GUI.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: if(exec.Ismacrostopped){return;}</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font COLOR="#000000" FACE="Arial">Function: </font><font FACE="Arial" COLOR="#0000ff"> 
+void</font><font FACE="Arial" COLOR="#000000" SIZE="2"> </font>
+<font face="Arial" color="#000000">Setoutpin(int portnumber, int 
+pinnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This functions sets the 
+selected output pin to high level.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Note: If a pin is called which is configured for a hardware 
+function, for example to act as a step or direction pin will override this 
+function.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: exec.Setoutpin(1, 2);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font COLOR="#000000" FACE="Arial">Function: </font><font FACE="Arial" COLOR="#0000ff"> 
+void </font>
+<font COLOR="#000000" FACE="Arial">Clroutpin(int portnumber, int 
+pinnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This functions sets the 
+selected output pin to low level.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Note: If a pin is called which is configured for a hardware 
+function, for example to act as a step or direction pin will override this 
+function.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: exec.Clroutpin(1, 2);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000"> 
+Code(</font><font FACE="Arial" COLOR="#0000ff">string</font><font FACE="Arial" COLOR="#000000"> 
+code)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function makes it possible to execute 
+one line of G-code from inside a macro. The G-code is sent as a string in the 
+parameter of the function and is interpreted in execution time.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: exec.Code(„G0 X10 Y20 Z0”);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000"> 
+Codelist(</font><font face="Arial" color="#0000ff">List</font><font face="Arial" color="#000000">&lt;</font><font face="Arial" color="#0000ff">string</font><font face="Arial" color="#000000">&gt; 
+codelist)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function is similar to the 
+Code function, but it executes not only a single, but multiply lines of g-codes 
+from inside a macro. The g-code lines are sent as a string List in the parameter 
+of the function and are interpreted in execution time. This function differs 
+from calling multiply Code functions, because the Codelist function loads all 
+the code lines the same time into the motion control API, so the lines are 
+optimised by the Constant velocity interpolator while the multiply Code function 
+calls are executed one-by-one separately.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: </font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">List&lt;string&gt; codelist = new List&lt;string&gt;(); 
+//Create a new List of strings.<br>
+codelist.Add(&quot;G0 Z-25&quot;); //Add g-code lines to the List.<br>
+codelist.Add(&quot;M3&quot;);<br>
+codelist.Add(&quot;G1 X0 Y0 F500&quot;);<br>
+codelist.Add(&quot;#5 = 12.23&quot;);<br>
+codelist.Add(&quot;G1 X#5 Y2&quot;);<br>
+exec.Codelist(codelist); //Execute the List of g-codes.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000"> 
+Callbutton(</font><font FACE="Arial" COLOR="#0000ff">int</font><font FACE="Arial" COLOR="#000000"> 
+buttonnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function calls an 
+internal function of the UCCNC software. The buttonnumber represents an internal 
+function number of the UCCNC software. The buttonnumber list is described in a 
+separate documentation file.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: exec.Callbutton(100);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function:</font><font face="Arial" color="#0000ff"> 
+string</font><font FACE="Arial" COLOR="#000000"> Readkey(</font><font face="Arial" color="#0000ff">string</font><font FACE="Arial" COLOR="#000000"> 
+section, </font>
+<font face="Arial" color="#0000ff">string</font><font FACE="Arial" COLOR="#000000"> 
+key, </font>
+<font face="Arial" color="#0000ff">string</font><font FACE="Arial" COLOR="#000000"> 
+defaultvalue)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function reads a key value 
+from the profile (.pro) file. The section and the key parameter defines which 
+key to read from the profile file and the function returns with the defaultvalue 
+parameter if the key does not exist in the profile file. The function returns a 
+string type.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: string mykeyvalue = exec.Readkey(&quot;axessettingscontrolX&quot;, 
+&quot;Axisenabled&quot;, &quot;False&quot;);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function:</font><font face="Arial" color="#0000ff">
+</font><font face="Arial" color="#0000FF">void</font><font FACE="Arial" COLOR="#000000"> 
+Writekey(</font><font face="Arial" color="#0000ff">string</font><font FACE="Arial" COLOR="#000000"> 
+section, </font>
+<font face="Arial" color="#0000ff">string</font><font FACE="Arial" COLOR="#000000"> 
+key, </font>
+<font face="Arial" color="#0000ff">string</font><font face="Arial"> </font>
+<font FACE="Arial" COLOR="#000000">value)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function writes a key value 
+into the profile (.pro) file. The section, and the key parameter defines which 
+key to write to the profile file. The value parameter is the new value to write. 
+If the key already exists in the profile file then the function overwrites the 
+key with the new value. If the key does not exist then the function creates the 
+key in the file with the set value.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: exec.Writekey(&quot;axessettingscontrolX&quot;, 
+&quot;Axisenabled&quot;, &quot;False&quot;);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial" color="#000000">Function: </font>
+<font face="Arial" color="#0000FF">void </font>
+<font face="Arial" color="#000000">Pluginshowup(</font><font face="Arial" color="#0000ff">string</font><font face="Arial" color="#000000"> 
+Pluginfilename)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function calls a Plugin file's Showup_event(); function. This 
+is useful when the plugin should do something on a button press event, 
+forexample when it should show it's GUI interface.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: exec.Pluginshowup(&quot;Plugintest.dll&quot;);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function:</font><font face="Arial" color="#0000FF"> void </font>
+<font face="Arial" color="#000000">Swapaxis(</font><font face="Arial" color="#0000FF">int</font><font face="Arial" color="#000000"> 
+axis1, </font><font face="Arial" color="#0000FF">int</font><font face="Arial" color="#000000"> 
+axis2)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function swaps the step and direction pin numbers and pin 
+negate settings of one axis with another axis. The axis swapping may be done any 
+times, the software saves the swapping sequences.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The axis number parameter can be in the range of 0 to 5 for the axis X to C axis 
+in order.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Be careful with saving the axis settings when the swapaxis function is in use. 
+If the settings are saved without pressing the Apply settings button first then 
+the swapped pins will be saved for the axis!</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: exec.Swapaxis(0,1); //Swaps the X-axis with Y-axis.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function:</font><font face="Arial" color="#0000FF"> void </font>
+<font face="Arial" color="#000000">Resetswapaxis()</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function resets the swap axis sequence with rolling back all the 
+previously called axis swapping sequences.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: exec.</font><font face="Arial" color="#000000">Resetswapaxis</font><font face="Arial">();
+</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000FF">void</font> Slaveaxis(<font color="#0000FF">int</font> 
+masteraxis, <font color="#0000FF">int</font> slaveaxis)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function slaves an axis to an axis. The masteraxis can be axis 
+X, Y and Z axis (numbers 0, 1, 2 respectively) and the slave axis can be A, B 
+and C axis (3, 4, 5 respectively). To remove the slave from the master axis use 
+value 0 on the slaveaxis parameter.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Be careful with saving the axis settings when the slaveaxis function is in use. 
+If the settings are saved without pressing the Apply settings button first then 
+the slave parameter will be saved for the master axis!</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: exec.Slaveaxis(0,3); //Makes A-axis slaving the X-axis.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000FF">void</font> Getanaloginput(<font color="#0000FF">int</font> channel)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function returns the actual value of an analog input channel 
+signal. The parameter defines the channel to be read. If the device has no 
+analog input channel with the channel number called then the return value will 
+be -1. The valid return range for the function is 0-65535.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: <font color="#0000FF">int</font> analogin1 = exec.Getanaloginput(1);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000FF">void</font> Getanalogoutput(<font color="#0000FF">int</font> 
+channel)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function returns the actual value of an analog output channe 
+signal. The parameter defines the channel to be read. If the device has no 
+analog output channel with the channel number called then the return value will 
+be -1. The valid return range for the function is 0-65535.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: <font color="#0000FF">int</font> analogout1 = exec.Getanalogoutput(1);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000FF">double </font>Getvar(<font color="#0000FF">int</font> 
+varnum)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function returns the value of an internal variable.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: <font color="#0000FF">double</font> myvar = exec.Getvar(1);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000FF">void</font> Setvar(<font color="#0000FF">double</font> 
+value, <font color="#0000FF">int</font> varnum)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function sets the value of an internal variable.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: exec.Setvar(1.234, 1);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify" dir="ltr">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: </font><font color="#0000FF" face="Arial">string</font><font face="Arial"> 
+TextQuestion(</font><font color="#0000FF" face="Arial">string</font><font face="Arial"> 
+Questiontext)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description:&nbsp; This function shows a Question form waiting for a string as 
+the answer. The text of the question shown on the Form is the parameter.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: <font color="#0000FF">string</font> val = exec.TextQuestion(&quot;Stop code 
+execution?&quot;);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000FF">double</font> Question(</font><font color="#0000FF" face="Arial">string</font><font face="Arial"> 
+Questiontext)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description:&nbsp; This function shows a Question form waiting for a double 
+value as the answer. The text of the question shown on the Form is the parameter.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: <font color="#0000FF">double</font> val = exec.Question(&quot;What X 
+position to move?&quot;);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">Function:
+<font color="#0000FF">void</font> Loadfile(<font color="#0000FF">string</font> 
+filename)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description:&nbsp; This function loads a g-code file. The parameter is a string 
+which is the full path of the file to be loaded.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: exec.Loadfile(&quot;C:/UCCNC/Example_codes/holders.tap&quot;);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000ff">bool</font><font FACE="Arial" COLOR="#000000"> 
+IsLoading(</font><font FACE="Arial" COLOR="#0000ff">void</font><font FACE="Arial" COLOR="#000000">)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: The function returns 
+true if the software is loading a g-code file and returns false if no file is 
+being loaded.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: while(exec.IsLoading()){}</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">Function:
+<font color="#0000ff">int </font>Showplugin(<font color="#0000ff">string</font> 
+pluginfilename)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description:&nbsp; This function calls the Showup event of a UCCNC plugin 
+installed in the /Plugins directory. The parameter is a string 
+which is the name of the plugin file including the .dll extension.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The possible return values are the following:</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+0: The plugin started without problems.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+1: The plugin is not enabled and can't run.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+2: The plugin was not found, there is no plugin installed with this filename.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+3.: The plugin does not have the Showup event implemented.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: int returnval = exec.Showplugin(&quot;Diagnostics.dll&quot;);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">Function:
+<font color="#0000ff">int </font>Configplugin(<font color="#0000ff">string</font> 
+pluginfilename)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description:&nbsp; This function calls the Config event of a UCCNC plugin 
+installed in the /Plugins directory. The parameter is a string 
+which is the name of the plugin file including the .dll extension.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The possible return values are the following:</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+0: The plugin started without problems.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+1: The plugin is not enabled and can't run.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+2: The plugin was not found, there is no plugin installed with this filename.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+3.: The plugin does not have the Config event implemented.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: int returnval = exec.Configplugin(&quot;Diagnostics.dll&quot;);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000ff">object </font>Informplugin(<font color="#0000ff">string</font> 
+Pluginfilename, <font color="#0000ff">object </font>Message)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function sends data to one plugin. The Pluginfilename 
+parameter defines the name of the plugin to send the message to and the 
+parameter is an object and the return value is also an object.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example:</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+string teststr = &quot;Hello Plugintest.dll...&quot;;<br>
+object Returnvalue = exec.Informplugin(&quot;Plugintest.dll&quot;, (object)teststr);<br>
+if (Returnvalue is string)<br>
+{<br>
+&nbsp; string str = Returnvalue as string;<br>
+&nbsp; MessageBox.Show(exec.mainform, &quot;Return message was: &quot; + str);<br>
+}</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000FF">void</font><font color="#0000ff"> </font>
+Informplugins(<font color="#0000ff">object </font>Message)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function sends data to all plugins. The parameter is an object 
+and there is no return value.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example:</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+string teststr = &quot;Hello to all plugins...&quot;;<br>
+exec.Informplugins((object)teststr);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000FF">void</font> RemoveRunfromhere()</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function removes the Initial movement Window of the Run from 
+here function to be shown condition after the Run from here button was pressed 
+or the button code was previously called, so the Initial movement Window will 
+not be shown and inital movement will not be made. The function can be used when 
+a plugin or macro changes the g-code line number to be executed and with calling 
+the Run from here button code and if the plugin or macro don't need the initial 
+movement preparation.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: exec.RemoveRunfromhere();</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000FF">void</font> GetRotate(<font color="#0000FF">out 
+double</font> Rx, <font color="#0000FF">out double</font> Ry,
+<font color="#0000FF">out double</font> Angle)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function returns the current G68 rotation point and rotation 
+angle.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: double Rx, Ry, Angle;</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Consolas" size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font><font face="Arial">&nbsp;GetRotate(out Rx, out Ry, out Angle);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000FF">string </font>Getgcodelinetext(<font color="#0000FF">int 
+</font>rownumber)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function returns one row of text from the loaded g-code file 
+pointed by the rownumber parameter.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: string linetext = exec.Getgcodelinetext(0); //Reads the first row of the g-code file.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000FF">string</font> Getcurrgcodelinetext(<font color="#0000FF">void</font>)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function returns one row of text from the loaded g-code file 
+pointed by the current line DRO pointer.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: string linetext = exec.Getcurrgcodelinetext();</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Function: <font color="#0000FF">int</font> Getcurrentgcodelinenumber(<font color="#0000FF">void</font>)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Description: This function returns the line number of the g-code file pointed by 
+the current line DRO pointer.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Example: int linenumber = exec.Getcurrgcodelinetext();</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000FF">int</font><font FACE="Arial" COLOR="#000000"> 
+Ismacrorunning(</font><font FACE="Arial" COLOR="#0000FF">int </font>
+<font face="Arial">macronumber</font><font FACE="Arial" COLOR="#000000">)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: The function returns</font><font face="Arial"> 
+the number of instances a text-macro is currently running. The function can be 
+used to check if a macro is already running or not. If for example the macro is 
+only allowed to run in one instance then the macro should contain a code to 
+return without the execution of the code in another instance. The function is 
+useful for example when calling text macros via button codes (M20000 to M21999) 
+and when it is unwanted to run the macro in more instances if the user clicks 
+the screen button more than one time while the macro is still running. The valid 
+range for the macronumber parameter is 0 to 99999. The function returns -1 if 
+the parameter is out of range. Note, that the macroloop runs are excluded from 
+this function, those macro instances will not count in the returned value of the 
+function. </font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: if(exec.Ismacrorunning(20000)&gt;1){ 
+return; } //The return value 1 indicates that only this one macro instance is 
+running. If the number is greater means that this is a second or third etc. 
+instance of the macro to be run.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+//Do macro functions here...</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial" color="#000000">Function:</font><font face="Consolas" size="2" color="#0000FF">
+</font><font face="Arial"><font color="#0000FF">
+Plugininterface.Datatypes.Tooltablestruct</font>[] Gettooltabledata(<font color="#0000FF">void</font>)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Description: The function returns an array of structures with all tools' 
+tool table parameter values in the detailed tooltable.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Example: Plugininterface.Datatypes.Tooltablestruct[] Tdata = 
+exec.Gettooltabledata();</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+MessageBox.Show(Tdata[1].Description); //Shows the Description parameter value 
+of Tool#1</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial" color="#000000">Function:</font><font face="Consolas" size="2" color="#0000FF">
+</font><font FACE="Arial" COLOR="#2b91af">List</font><font face="Arial">&lt;</font><font color="#0000FF" face="Arial">Plugininterface.Datatypes.Layerdatastruct</font><font face="Arial">&gt; 
+Getlayerslist(<font color="#0000FF">bool </font>isAS3)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Description: The function returns a List of structures with 
+all screen layers' parameters. If the AS3 parameter is true then the main 
+screen's layers parameters are return otherwise the jog screen layers parameters 
+are returned.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Example: <font color="#2b91af">List</font>&lt;<font color="#0000FF">Plugininterface.Datatypes.Layerdatastruct</font>&gt;<font color="#0000FF">
+</font>Ldata = exec.Getlayerslist(<font color="#0000FF">true</font>);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font color="#0000FF" face="Arial">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font><font face="Arial">MessageBox.Show(&quot;&quot; + Ldata[1].Isactive); //Shows the 
+Isactive property of the first layer in the List.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+2</font><font FACE="Arial" COLOR="#000000">. The following list contains the AS3 
+and AS3jog object's functions which are callable from any macros. </font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font face="Arial" color="#0000ff">string</font><font face="Arial" color="#000000"> 
+Getfield(</font><font face="Arial" color="#0000ff">int</font><font face="Arial" color="#000000"> 
+fieldnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function reads the value of 
+a field object and returns the value in a string.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example:  </font>
+<font face="Arial" color="#0000ff">string</font><font FACE="Arial" COLOR="#000000"> 
+fieldvalue = AS3.Getfield(100);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font face="Arial" color="#0000ff">void</font><font FACE="Arial" COLOR="#000000"> 
+Setfield(</font><font face="Arial" color="#0000ff">double</font><font FACE="Arial" COLOR="#000000"> 
+value, </font><font face="Arial" color="#0000ff">int</font><font face="Arial" color="#000000"> 
+fieldnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function sets the value of 
+a field object. If the field exists on the screen on any tab pages then it will 
+update it's value. If it does not exist then</font><font face="Arial"> this 
+function will do nothing.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Note that there are fields like the position DROs and feedrate, spindle speed 
+etc. DROs which are updated in the UCCNC from internal variables in loops, these 
+fields cannot be updated permamently using this method,</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+because the internal functions will rewrite these fields with the internal 
+variable values. Call the Validatefield after the Setfield function to change 
+the value of these kind of fields.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: AS3.Setfield(15.23, 100);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font face="Arial" color="#0000ff">void</font><font FACE="Arial" COLOR="#000000"> 
+Validatefield(</font><font face="Arial" color="#0000ff">int</font><font face="Arial" color="#000000"> 
+fieldnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function validates the value of 
+a field object. If the field exists on the screen on any tab pages then the 
+function executes. If it does not exist then</font><font face="Arial"> this 
+function will do nothing.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">When this function is called then the field value changed 
+event is called inside the UCCNC core and the software will make the actions 
+nessessary to validate the actual value of the field.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: AS3.Setfield(12.34, 97); //Sets the 
+value of the X current coordinate field to 12.34</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+ 
+</font><font FACE="Arial" COLOR="#000000">AS3.</font><font face="Arial">Validatefield(97); //Validates the 12.34 valuefor the X current coordinate field&nbsp; 
+with writting the offset coordinates as nessessary.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font face="Arial" color="#0000ff">void</font><font FACE="Arial" COLOR="#000000"> 
+Setfieldtext(</font><font FACE="Arial" COLOR="#0000FF">string</font><font FACE="Arial" COLOR="#000000"> 
+value, </font><font face="Arial" color="#0000FF">int </font>
+<font face="Arial" color="#000000">fieldnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function sets the value of 
+a field. If the field exists on the screen on any tab pages then it will update 
+it's value. If it does not exist then</font><font face="Arial"> this function 
+will do nothing.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Note that there are fields like the position DROs and feedrate, spindle speed 
+etc. DROs which are updated in the UCCNC from internal variables in loops, these 
+fields cannot be updated permamently using this method,</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+because the internal functions will rewrite these fields with the internal 
+variable values. Call the Validatefield after the Setfield function to change 
+the value of these kind of fields.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: AS3.Setfieldtext(&quot;This is my field&quot;, 
+100);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000FF">bool</font><font FACE="Arial" COLOR="#000000"> 
+GetLED(</font><font face="Arial" color="#0000FF">int </font>
+<font face="Arial" color="#000000">LEDnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function returns the logic 
+state of a LED screen object. If the LED is on then the function returns &quot;true&quot; 
+or if the LED is off then this function returns &quot;false&quot;. If the LED does not 
+exist on the screen then the return value is &quot;false&quot;.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: bool stateofmyLED = AS3.GetLED(18);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000FF">void</font><font FACE="Arial" COLOR="#000000"> 
+SetLED(</font><font face="Arial" color="#0000ff">bool </font>
+<font FACE="Arial" COLOR="#000000">state, </font>
+<font face="Arial" color="#0000ff">int</font><font FACE="Arial" COLOR="#000000"> </font>
+<font face="Arial" color="#000000">LEDnumber</font><font FACE="Arial" COLOR="#000000">)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function sets the logic 
+state of a LED screen object. If the LED does not exist on the screen then this 
+funtion will do nothing.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Note: There are LEDs which values are refreshed from internal loops of the UCCNC, 
+these LEDs cannot be set with this function, because the value will update from 
+the UCCNC's internal loop. For example the Idle and run LEDs cannot be set with 
+this function. Basicly this function is to set user LEDs which are not used by 
+the UCCNC core.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: AS3.SetLED(true, 1000);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000FF">bool</font><font FACE="Arial" COLOR="#000000"> 
+Getbutton(</font><font face="Arial" color="#0000FF">int </font>
+<font face="Arial">button</font><font face="Arial" color="#000000">umber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function returns true if 
+the button is being pressed on the screen or with an input trigger and returns 
+false if the button is released.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: while(!AS3.Getbutton(128)); //Waits 
+for the cycle start button press on the main screen.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font FACE="Arial" COLOR="#0000FF">bool</font><font FACE="Arial" COLOR="#000000"> 
+Getbuttonstate(</font><font face="Arial" color="#0000FF">int </font>
+<font face="Arial">button</font><font face="Arial" color="#000000">umber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function </font>
+<font face="Arial">works with toggle type buttons and returns true if the button 
+is in it's on state and returns false when the button is in it's off state. The 
+function always returns false for non-toggle type buttons.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: bool buttonstate = AS3.Getbuttonstate(114); //Checks 
+if the M3 spindle on/off button is active.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Function: </font>
+<font face="Arial" color="#0000FF">void</font><font face="Arial" color="#000000"> 
+Switchbutton(</font><font face="Arial" color="#0000FF">bool</font><font face="Arial" color="#000000"> 
+Ison, </font><font face="Arial" color="#0000FF">int</font><font face="Arial" color="#000000"> 
+Buttonnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function </font>
+<font face="Arial">works with toggle type buttons and switches the button to on/off 
+states. If the Ison parameter is true switches the button to the on state and 
+false switches to the off state. The function can be used for example in buttons' 
+macros to change the state of the button toggling it's visual state.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Example: AS3.Switchbutton(true, 128);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">Function:
+<font color="#0000FF">string</font> Getcomboboxselection(<font color="#0000FF">int
+</font>labelnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function returns the 
+selected text string of a combobox screen item.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Example: string selectedtext = AS3.Getcomboboxselection(1);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">Function:
+<font color="#0000FF">List</font>&lt;<font color="#0000FF">string</font>&gt; Getlist(<font color="#0000FF">int
+</font>labelnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function returns all items 
+of a screen list. The return type is a list of strings.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Example: </font><font face="Arial" color="#000000">
+List&lt;string&gt; mylist = AS3.Getlist(2);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">Function:
+<font color="#0000FF">List</font>&lt;<font color="#0000FF">string</font>&gt; 
+GetMDIhistory()</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">Description: This function returns all items 
+previously typed into the MDI control.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Example: </font><font face="Arial" color="#000000">
+List&lt;string&gt; mylist = </font>
+<font face="Arial">AS3.GetMDIhistory();</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">Function: </font>
+<font face="Arial" color="#0000FF">void</font><font face="Arial"> 
+ClearMDIhistory()</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Description: This function clears the MDI history list.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Example: AS3.ClearMDIhistory();</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Function: <font color="#0000FF">void</font> Sendimageview(<font color="#0000FF">Image</font> 
+img, <font color="#0000FF">int</font> Labelnumber)<br>
+Description: This functions sends a picture image to an imageviewer.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Example: //This example code sends and rotates a picture 
+image around it's center and displays it in an imageview control</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Image img1 = Image.FromFile(Application.StartupPath + 
+&quot;/a.png&quot;);<br>
+for (int i = 0; i &lt; 360; i++)<br>
+{<br>
+&nbsp; Image imgdraw = (Image)img1.Clone();<br>
+&nbsp; using (Graphics g = Graphics.FromImage(imgdraw))<br>
+&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; // Set the rotation point to the center in the matrix<br>
+&nbsp;&nbsp;&nbsp; g.TranslateTransform(imgdraw.Width / 2, imgdraw.Height / 2);<br>
+&nbsp;&nbsp;&nbsp; // Rotate<br>
+&nbsp;&nbsp;&nbsp; g.RotateTransform(i);<br>
+&nbsp;&nbsp;&nbsp; // Restore rotation point in the matrix<br>
+&nbsp;&nbsp;&nbsp; g.TranslateTransform(-imgdraw.Width / 2, -imgdraw.Height / 
+2);<br>
+&nbsp;&nbsp;&nbsp; // Draw the image on the bitmap<br>
+&nbsp;&nbsp;&nbsp; g.DrawImage(imgdraw, new Point(0, 0));<br>
+}<br>
+<br>
+AS3.Sendimageview(imgdraw, 1);<br>
+imgdraw.Dispose();<br>
+Thread.Sleep(30);<br>
+if(exec.Ismacrostopped())<br>
+{<br>
+&nbsp; return;<br>
+}<br>
+}</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p>&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<font FACE="Consolas" SIZE="2"></font>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+</body>
+
+</html>

@@ -1,0 +1,427 @@
+<html>
+
+<head>
+<meta name="GENERATOR" content="Microsoft FrontPage 5.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1250">
+<title>This document describes the UCCNC software macro function calls 
+capability</title>
+<style>
+<!--
+		P { margin-bottom: 0.21cm }
+-->
+</style>
+</head>
+
+<body>
+
+<p STYLE="margin-top: 0; margin-bottom: 0cm" align="center">&nbsp;</p>
+<p STYLE="margin-top: 0; margin-bottom: 0cm" align="center">
+<font FACE="Arial" COLOR="#000000" size="4">This document describes the <b>UCCNC software</b> 
+screenset function calls capability.</font></p>
+<p STYLE="margin-top: 0; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">All the screen elements in the UCCNC software are defined in 
+the external screenset sript file which file is located in the /Screens folder 
+of the UCCNC installation.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">The screenset files have a .ssf (Screen Set File) extension 
+and are plain textfiles editable with notepad in Windows.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">There may be more than one screenset files in the /Screens 
+directory. Which screenset file is loaded on the software startup is defined in 
+the profile file,</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">the key which defines the name of the screenset file to be 
+loaded is in the following section with the following name:</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">[Screensetsettings]<br>
+mainscreenfilename=Defaultscreenset</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">The UCCNC software first loads the profile file and reads the 
+name of the screenset file and executes the script in this file.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">The screenset file contains the definition of all screen 
+elements, it defines the tab layers, the backgrounds, the buttons, the fields 
+placements, dimensions, images etc.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">Basicly the UCCNC GUI is blank and all screen elements are 
+uloaded to the screen from the screenset file.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">This makes the screen changeable and freely editable for the 
+user, because all the screen elements can be changed in the external screenset 
+script file.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000">The screenset file's programming language is 
+C# (C-sharp). The language is not described in this documentation, but it is 
+very similar to C language and for those who are yet not familiar with C# 
+programming we recommend to study the following Wiki page: </font>
+<font face="Arial">
+<a HREF="http://en.wikipedia.org/wiki/C_Sharp_syntax" TARGET="_blank" style="so-language: zxx">
+http://en.wikipedia.org/wiki/C_Sharp_syntax</a></font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">There are 2 different display objects or let's call them 
+canvas on the screen the mainform.AS3 and the mainform.AS3jog. The AS3 is the 
+main screen canvas and the AS3jog is the jog panel on the left side of the 
+screen and the screen elements can be uploaded onto these separately.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">In this documentation we describe the screenset associated 
+function calls, the prototypes of these functions with some descriptions and 
+examples are shown below.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Function:</b> <font color="#0000ff">void</font> Loadpicture(<font color="#0000ff">string</font> 
+pictureupURL,<font color="#0000ff"> string</font> picturedownURL,
+<font color="#0000ff">int</font> picturenumber, <font color="#0000ff">bool</font> 
+IsLastpicturetoload)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Description:</b> This function loads 2 images into the memory, the first 2 
+parameters are the filenames with the directory path for the image files. The 
+base path is the UCCNC installation /Flashscreen/ path.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The pictureupURL will be the image which is shown when a button is not pressed 
+(is released) and the picturedown is the image which is shown when the button is 
+being pressed. </font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+For screen elements like for backgrounds where only one image is used set both 
+parameters the same and the software will automatically load one instance only 
+into the memory.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The picturenumber is an identifier for the picture, this identifier can be later 
+used to identify this image when the image has to be rendered onto a screen 
+object like on a button or a background, tab layer etc.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000"><b>Example:</b> </font><font face="Arial">
+AS3.Loadpicture(bitmapfolder + &quot;plus_up.png&quot;, bitmapfolder + &quot;plus_down.png&quot;, 
+22, false);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Function:</b><font color="#0000ff"> void</font> Addtab(<font color="#0000ff">string</font> 
+labeltext, <font color="#0000ff">string</font> labelfont, <font color="#0000ff">
+string</font> textalign, <font color="#0000ff">int</font> fontsize,
+<font color="#0000ff">int </font>fontcolor, <font color="#0000ff">int </font>
+posX, <font color="#0000ff">int</font> posY, <font color="#0000ff">int</font> 
+labelwidth, <font color="#0000ff">int</font> labelheight, <font color="#0000ff">
+int</font> picturenumber, <font color="#0000ff">int </font>labelnumber,
+<font color="#0000ff">int</font> parentnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Description: </b>This function adds one tab layer on the screen. Tab layers 
+are the base screen elements in the UCCNC software and they are like layers in a 
+CAD software.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The tab layers can contain other screen elements like buttons, fields, 
+background images etc. </font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+There can be any number of tab layers on the screen and by default the tab 
+layers are all transparent.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Every tab layer object has an identifier which is the labelnumber parameter and 
+also a parent number which is the last parameter.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Tab layers can be in parent-child relation with eachother, the parentnumbet 
+defines the parent of the tab layer.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The tabs which has the same parent numbers are on the same level and just like 
+in Windows tab controls one time only one layer can be selected from the same 
+level tabs and the screen items on the other same level tab layers are hidden.
+</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Every tab layer has a label which is a graphical object and is used to allow the 
+user to press and select the tab layer. The label position and width and height 
+can be defined with the posX, posY, labelwidth, labelheight parameters and the 
+label can also have a picture rendered onto it, the picturenumber defines which 
+previously loaded picture is rendered onto the label.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000"><b>Example: </b></font><font face="Arial">
+AS3.Addtab(&quot;&quot;, &quot;Arial&quot;, &quot;center&quot;, 14, 0, 69, 30, 100, 18, 94,20, 4);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<font FACE="Consolas" SIZE="2">
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"></font><font face="Arial">
+<b>Function: </b><font color="#0000ff">void</font> selectlayer(<font color="#0000ff">int</font> 
+layernumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Description: </b>This function selects a tab layer, so that any other tab 
+layers on the same level will be hidden and this tab layer will be shown on the 
+software startup.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000"><b>Example: </b></font><font face="Arial">
+AS3.selectlayer(2);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Function: </b><font color="#0000ff">void</font> Addbackground(<font color="#0000ff">double</font> 
+posX, <font color="#0000ff">double</font> posY, <font color="#0000ff">double</font> 
+width, <font color="#0000ff">double</font> height,<font color="#0000ff"> int</font> 
+picturenumber, <font color="#0000ff">int</font> backgroundnumber,
+<font color="#0000ff">int</font> layernumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Description: </b>This function renders an image onto a tab layer, in other 
+words it places a background onto a tab layer.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The posX and posY parameters define the top-left corner of the image to be 
+placed. The width and height parameters defines how wide and how tall the image 
+will be in pixels.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+If the image has a different dimensions than the width and height parameters 
+then the image will be scaled into the placement dimensions.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The picturenumber parameter is the identifier of the picture to use and the 
+background number will be the identifier of this background. The layernumber is 
+the number of the tab layer to place the image onto.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000"><b>Example: </b></font><font face="Arial">
+AS3.Addbackground(0, 0, 1024, 692, 121, 11, 12);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Function: </b><font color="#0000ff">void</font> Addbutton(<font color="#0000ff">double</font> 
+xposition, <font color="#0000ff">double</font> yposition, <font color="#0000ff">
+double</font> width, <font color="#0000ff">double </font>height,<font color="#0000ff"> 
+bool </font>toggletype, <font color="#0000ff">bool</font> blinktype,
+<font color="#0000ff">int</font> picturenumber, <font color="#0000ff">int</font> 
+buttonnumber, <font color="#0000ff">int </font>layernumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Description: </b>This function adds one button&nbsp; object to the screen. 
+The first 2 parameters are the X and Y position in pixels of the top-left corner 
+of the button. </font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The width and height are also in pixels and they define how wide and how tall 
+the button will be.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+If the toggletype parameter is true then the button is toggling between the on 
+and off states with rendering the left side half image onto the button in the 
+off state and rendering the right side half image in the on state of the button.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+If the blinktype parameter is true then in the on state of the button the 
+rendering of the left and right side images is rendered periodically creating a 
+blinking effect.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The picturenumber is the identifier of the image used to 
+render this button,</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+this identifier was set in the Loadpicture functions and any picture which was 
+loaded previously can be selected.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The buttonnumber is an identifier for this button and this identifier also 
+defines the function of this button. For example code 128. is the cycle start 
+button code.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The different button codes are listed and described in a separated document.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The layernumber defines on which tab layer will the button appear on.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font FACE="Arial" COLOR="#000000"><b>Example: </b></font><font face="Arial">
+AS3.Addbutton(50, 60, 100, 100, false, 18, 128, 2); </font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Function: </b><font color="#0000ff">void</font> Addfield(<font color="#0000ff">string</font> 
+labeltext, <font color="#0000ff">string</font> labelfont, <font color="#0000ff">
+string</font> textalign, <font color="#0000ff">int</font> fontsize,
+<font color="#0000ff">int</font> fontcolor, <font color="#0000ff">double</font> 
+posX, <font color="#0000ff">double</font> posY, <font color="#0000ff">int</font> 
+fieldwidth, <font color="#0000ff">string</font> type, <font color="#0000ff">
+double</font> min, <font color="#0000ff">double</font> max,
+<font color="#0000ff">int </font>labelnumber, <font color="#0000ff">int</font> 
+layernumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Description: </b>This function adds one field object onto the screen. </font>
+<font face="Arial" color="#000000">Each field object represents a text label on the UCCNC screen. </font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The labeltext parameter defines a text string which will be written before the 
+field on the screen. The labelfont parameter defines the font used for both the 
+text string and the field text.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The textalign parameter defines where the text is aligned inside the field, the 
+possible values are &quot;left&quot;, &quot;right&quot; and &quot;center&quot;.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The fontsize defines the size of the dont used to render the field text and the 
+fontcolor is the color of the font in integer format of the RGB color code.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The posX and posY parameters defines the top-left corner of the field and the 
+fieldwidth defines the length of the field in pixels.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The type is a special parameter, the possible values are the &quot;textfield&quot;, &quot;textfieldnb&quot;, &quot;showfield&quot;, &quot;showfieldnb&quot;, 
+&quot;field&quot;, &quot;fieldnb&quot;.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">The &quot;textfield&quot;, &quot;textfieldnb&quot;, &quot;field&quot;, 
+&quot;fieldnb&quot; type fields can be read and written from macro code and 
+are editable by the user on the UCCNC GUI.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The &quot;textfield&quot;, &quot;textfieldnb&quot; can contain any kind of text 
+including words. The &quot;field&quot;, &quot;fieldnb&quot; can contain numerical values only.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">The &quot;showfield&quot;, &quot;showfieldnb&quot; type labels can be read and written from macro code and 
+are not editable by the user on the UCCNC GUI.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">The &quot;nb&quot; at the end of the parameter means &quot;no border&quot;, so 
+these type of fields will have no visual border on the screen.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">The min and max parameters defines the minimal and maximal 
+numerical value for the &quot;field&quot;, &quot;fieldnb&quot; type fields, the user can't enter 
+numbers out of this range.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">The labelnumber is the identifier number of the field, the 
+different label numbers and their meaning are listed in a separated document.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">The layernumber is the number of the tab layer the field will 
+appear on.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial"><b>Example:</b> AS3.Addfield(&quot; &quot;, &quot;Arial&quot;, &quot;right&quot;, 21, 
+7961465, 50, 100, 128, &quot;showfieldnb&quot;, double.MinValue, double.MaxValue, 866, 2);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Function: </b>
+<b>&nbsp;</b><font color="#0000ff">void </font>Setfield(<font color="#0000ff">double</font> 
+value, <font color="#0000ff">int</font> labelnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<font face="Arial">
+<b>Description: </b>This function sets the initial value of a field object. The 
+value parameter is the numeric value of the field and the labelnumber is the 
+number of the label to set the value of.</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Example: </b>AS3.Setfield(0, 866);</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Function: </b><font color="#0000ff">void</font> Setfieldtext(<font color="#0000ff">string</font> 
+value, <font color="#0000ff">int</font> labelnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Description: </b>This function sets the initial text of a field object. The 
+value parameter is a string and the labelnumber is the number of the label to 
+set the text of.</font></p>
+<font FACE="Consolas" SIZE="2"></font>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Example: </b>AS3.Setfieldtext(&quot;initialtext&quot;, 866);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Function: </b></font><font color="#0000ff" face="Arial">void </font>
+<font face="Arial">Filterfieldtext(<font color="#0000ff">string</font> value,
+<font color="#0000ff">int</font> labelnumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Description: </b>This function filters the characters which can be input into 
+a field. The characters in the value string can be input to the field, all other 
+characters are prohibited.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+Note, that if a '-' character needs to be allowed in the filter then the \\ mark 
+must be placed before the '-' character, because the '-' char means a range.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Example:&nbsp; </b>AS3.Filterfieldtext(&quot;0123456789.\\-%&quot;, 232);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+AS3.Filterfieldtext(&quot;0-9&quot;, 232); //Allows characters 0123456789, because the - 
+character means range.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Function:</b> <font color="#0000ff">void</font> Addled(<font color="#0000ff">double</font> 
+posX, <font color="#0000ff">double</font> posY, <font color="#0000ff">double</font> 
+width, <font color="#0000ff">double</font> height, <font color="#0000ff">int
+</font>picturenumber, <font color="#0000ff">int</font> LEDnumber,
+<font color="#0000ff">int</font> layernumber)</font></p>
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Description: </b>This function adds a LED to the screen. The posX and posY 
+defines the top-left corner position of the LED, the parameters are in pixels.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The width and heigh parameters defines the dimensions of the LED and these 
+parameters are also in pixels.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The picturenumber is the number of the image to render onto the LED. The 
+LEDnumber is the unique identifier of the LED. </font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The LED numbers and their meaning are described in a separated document.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The layernumber is the number of the tab layer the LED will appear on.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Example: </b>AS3.Addled(530, 420, 6, 37, 68, 216, 2);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Function: </b><font color="#0000ff">void</font> Addmdi(<font color="#0000ff">string</font> 
+labeltext, <font color="#0000ff">string</font> labelfont, <font color="#0000ff">
+string</font> textalign, <font color="#0000ff">int</font> fontsize,<font color="#0000ff"> 
+int</font> fontcolor, <font color="#0000ff">int </font>posX,
+<font color="#0000ff">int</font> posY, <font color="#0000ff">int</font> width,
+<font color="#0000ff">int</font> MDInumber,
+<font color="#0000ff">int </font>layernumber)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Description: </b>This function adds an MDI control to the screen. The 
+labeltext parameter is similar as with the field type object, it is a text 
+string appearing before the MDI control.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The labelfont defines the font type used to render the text in the control, the 
+textalign sets the text inside the control's field, the fontsize sets the size 
+of the font in pixels.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The fontcolor is the RGB color code in integer format. The posX and posY defines 
+the top-left corner position of the MDI control and the width parameter defines 
+the width of the MDI textfield in pixels.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The MDInumber is the identifier of the MDI object and the layernumber defines which layer the MDI will appear on.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Example: </b>AS3.Addmdi(&quot;This is an MDI:&quot;, &quot;Arial&quot;, &quot;left&quot;, 26, 4564978, 541, 
+421, 280, 2);</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">&nbsp;</p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify">
+<b><font face="Arial">Function:</font></b><font face="Arial">
+<font color="#0000ff">void</font> Addcheckbox(<font color="#0000ff">string</font> 
+labeltext, <font color="#0000ff">string</font> labelfont, <font color="#0000ff">
+int</font> fontsize, <font color="#0000ff">int</font> fontcolor,<font color="#0000ff"> 
+int</font> posX, <font color="#0000ff">int</font> posY, <font color="#0000ff">
+int</font> boxnumber, <font color="#0000ff">int</font> layernumber)</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Description: </b>This function adds a checkbox control to the screen. The 
+labeltext parameter is similar as with the field type object, it is a text 
+string appearing before the checkbox control.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The labelfont defines the font type used to render the text in the control, the 
+textalign sets the text inside the control's field, the fontsize sets the size 
+of the font in pixels.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The fontcolor is the RGB color code in integer format. The posX and posY defines 
+the top-left corner position of the checkbox control.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The boxnumber is the unique identifier of the checkbox control. The checkboxes 
+numbers and their meaning are described in a separated documentation.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+The layernumber defines which layer the checkbox will appear on.</font></p>
+
+<p STYLE="margin-top: 2; margin-bottom: 0cm" align="justify"><font face="Arial">
+<b>Example: </b>AS3.Addcheckbox(&quot;&quot;, &quot;Arial&quot;, 16, 0, 50, 100, 100, 2); </font></p>
+
+</body>
+
+</html>

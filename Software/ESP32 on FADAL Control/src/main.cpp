@@ -19,14 +19,14 @@
   //--- Inputs ----//
     #define scale_select 13
     #define axis_select 12
-    #define feed_override_A 14
-    #define feed_override_B 27
+    #define feed_override_A 27
+    #define feed_override_B 14
     #define feed_override_switch 26
-    #define spindle_override_A 25
-    #define spindle_override_B 33
+    #define spindle_override_A 33
+    #define spindle_override_B 25
     #define spindle_override_switch 32
-    #define tool_select_A 35
-    #define tool_select_B 34
+    #define tool_select_A 34
+    #define tool_select_B 35
     #define tool_select_switch 39
   //--- RS485 ----//
     #define RS485_TX 17
@@ -43,9 +43,10 @@
   ESP32Encoder encoder3; // Feedrate Override encoder //
   
 /*################ Variables ################*/
-  int E1prev, E2prev, MPG_Axis_Select_val, MPG_Multiplicaton;
+  int E1prev, E2prev, E3prev, MPG_Axis_Select_val, MPG_Multiplicaton;
   int E1current = 100;
   int E2current = 100;
+  int E3current = 100;
   bool FeedOverrideChanged = false;
   bool SpindleSpeedOverrideChanged = false;
   unsigned long currentMillis;
@@ -177,31 +178,39 @@
       }
 
     //------------------- FeedOverRide -------------------//
-      /*void FeedOverRide() {
-        if (digitalRead(tool_select_switch) == LOW) {
-          E1current = 100;
-          E1prev = encoder1.getCountRaw();
+      void FeedOverRide() {
+        if (digitalRead(feed_override_switch) == LOW) {
+          E3current = 100;
+          E3prev = encoder3.getCountRaw();
           FeedOverrideChanged = true;
         }
         
-        if (encoder1.getCountRaw() != E1prev) {
-          if (encoder1.getCountRaw() < E1prev) {
-            if (E1current > 0) {
-              E1current = E1current - 10;
+        if (encoder3.getCountRaw() != E3prev) {
+          if (encoder3.getCountRaw() < E3prev) {
+            if (E3current > 0) {
+              E3current = E3current - 10;
             }
           }
-          if (encoder1.getCountRaw() > E1prev) {
-            if (E1current < 300) {
-              E1current = E1current + 10;
+          if (encoder3.getCountRaw() > E3prev) {
+            if (E3current < 300) {
+              E3current = E3current + 10;
             }
           }
-          E1prev = encoder1.getCountRaw();
+          E3prev = encoder3.getCountRaw();
           FeedOverrideChanged = true;
         }
 
+        // Master to slave
+        // mb.addHreg(17);    // Feed Override Watchdog
+        // mb.addHreg(18);    // Feed Override UCCNC Value
+
+        // Slave to master
+        // mb.addHreg(56);    // Feed Override
+        // mb.addHreg(57);    // Feed Override watchdog
+
         // Change made in UCCNC
         if(mb.Hreg(17) == 1){ // UCCNC watchdog signals a change
-          E1current = mb.Hreg(18); // Place value from UCCNC into Control Panel
+          E3current = mb.Hreg(18); // Place value from UCCNC into Control Panel
           mb.Hreg(57, 2); // Confirm to UCCNC that message is recieved
           while (mb.Hreg(17) != 0){ //Whait for confirmation from UCCNC
             mb.Hreg(56, mb.Hreg(18)); // Equalize Value in both registers
@@ -215,12 +224,13 @@
           FeedOverrideChanged = false;
           mb.Hreg(57, 1); // Control panel watch dog sends signal to UCCNC that someting has changed
           while (mb.Hreg(17) != 2){ //Whait for confirmation from UCCNC that fields have been updated
-            mb.Hreg(56, E1current); // Place new value from Control Panel in register
+            mb.Hreg(56, E3current); // Place new value from Control Panel in register
             mb.task(); yield(); // Keep modbus engine running
           }
           mb.Hreg(57, 0); // All is equalised, set watchdog to sleep!
         }
-      }*/
+      }
+
 
     //------------------- MPG_control_Select -------------------//
       int previous_MPG_Axis_Select_val, previous_MPG_Multiplicaton;
@@ -281,7 +291,7 @@
       encoder3.attachSingleEdge(feed_override_A, feed_override_B);
       E1prev = encoder1.getCountRaw(); // Tool select //
       E2prev = encoder2.getCountRaw(); // Spindle Override //
-      E2prev = encoder3.getCountRaw(); // Feed Override //
+      E3prev = encoder3.getCountRaw(); // Feed Override //
       pinMode(tool_select_switch, INPUT_PULLUP); // Encoder 1 switch pin //
       pinMode(spindle_override_switch, INPUT_PULLUP); // Encoder 2 switch pin //
       pinMode(feed_override_switch, INPUT_PULLUP); // Encoder 3 switch pin //
@@ -345,7 +355,7 @@
   void loop() {
       LED_Control();
       SpindleSpeedOverRide();
-      //FeedOverRide();
+      FeedOverRide();
       MPG_control_Select();
       if (Debuging_Mode){ Debug(); }
       if(mb.Hreg(18) == 1){isMoving = true;}else{isMoving = false;}

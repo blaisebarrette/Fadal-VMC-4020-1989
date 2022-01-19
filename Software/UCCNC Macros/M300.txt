@@ -137,8 +137,9 @@
         }
 
     //---- Feed Override ----//
+    
         // Change made in Control panel
-        /*if(_Feed_Override_watchdog == 1){// Control panel watchdog signals a change
+        if(_Feed_Override_watchdog == 1){// Control panel watchdog signals a change
             AS3.Setfield(_FeedOverride,232); // insert value from register into UCCNC field
             AS3.Validatefield(232); // Validate entry
             exec.SetModbusregister(17, 2); // Confirm to Control Panel that message is recieved
@@ -159,7 +160,6 @@
         if (_Feed_Override_watchdog == 2){ //Whait for confirmation from Control panel that display has been updated
             exec.SetModbusregister(17, 0); // All is equalised, set watchdog to sleep!
         }
-        */
 
     //---- Axis and scale select ----//
         if(HardMPG == 1){ // If Hard MPG is selected
