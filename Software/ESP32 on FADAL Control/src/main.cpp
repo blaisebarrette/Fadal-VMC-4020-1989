@@ -44,9 +44,10 @@
   
 /*################ Variables ################*/
   int E1prev, E2prev, E3prev, MPG_Axis_Select_val, MPG_Multiplicaton;
-  int E1current = 100;
+  int E1current = 1;
   int E2current = 100;
   int E3current = 100;
+  bool ToolSelectChanged = false;
   bool FeedOverrideChanged = false;
   bool SpindleSpeedOverrideChanged = false;
   unsigned long currentMillis;
@@ -123,6 +124,67 @@
           digitalWrite(light_LED,LOW);
         }
       }
+
+    //------------------- ToolSelect -------------------//
+      void ToolSelect() {  
+        if (digitalRead(tool_select_switch) == LOW) {
+          mb.Hreg(58, 1);
+        }else{
+          mb.Hreg(58, 0);
+        }
+        
+        if (encoder1.getCountRaw() != E1prev) {
+          if (encoder1.getCountRaw() < E1prev) {
+            if (E1current > 0) {
+              E1current = E1current - 1;
+            }
+            if (E1current == 0) {
+              E1current = 21;
+            }
+          }
+          if (encoder1.getCountRaw() > E1prev) {
+            if (E1current < 21) {
+              E1current = E1current + 1;
+            }
+            if (E1current == 22) {
+              E1current = 1;
+            }
+          }
+          E1prev = encoder1.getCountRaw();
+          ToolSelectChanged = true;
+        }
+
+        // From Master to slave
+        // mb.addHreg(13);    // Tool Select Watchdog
+        // mb.addHreg(14);    // Tool Select UCCNC Value
+
+        // From slave to master
+        // mb.addHreg(52);    // Tool_Select
+        // mb.addHreg(53);    // Tool Select watchdog
+
+        // Change made in UCCNC
+        if(mb.Hreg(13) == 1){ // UCCNC watchdog signals a change
+          E1current = mb.Hreg(14); // Place value from UCCNC into Control Panel
+          mb.Hreg(53, 2); // Confirm to UCCNC that message is recieved
+          while (mb.Hreg(13) != 0){ //Wait for confirmation from UCCNC
+            mb.Hreg(52, mb.Hreg(14)); // Equalize Value in both registers
+            mb.task(); yield(); // Keep modbus engine running
+          }
+          mb.Hreg(53, 0); // All is equalised, set watchdog to sleep!
+        }
+
+        // Change made in Control Panel
+        if(ToolSelectChanged){ 
+          ToolSelectChanged = false;
+          mb.Hreg(53, 1); // Control panel watch dog sends signal to UCCNC that someting has changed
+          while (mb.Hreg(13) != 2){ //Whait for confirmation from UCCNC that fields have been updated
+            mb.Hreg(52, E1current); // Place new value from Control Panel in register
+            mb.task(); yield(); // Keep modbus engine running
+          }
+          mb.Hreg(53, 0); // All is equalised, set watchdog to sleep!
+        }
+      }
+
     //------------------- SpindleSpeedOverRide -------------------//
       void SpindleSpeedOverRide() {  
         if (digitalRead(spindle_override_switch) == LOW) {
@@ -344,6 +406,8 @@
       mb.addHreg(55);    // Spindle Speed Override watchdog
       mb.addHreg(56);    // Feed Override
       mb.addHreg(57);    // Feed Override watchdog
+      mb.addHreg(58);    // Activate tool change
+
 
     // Serial debug. Runs only if variable "Debuging_Mode" is set to true //
       if (Debuging_Mode) {
@@ -354,6 +418,7 @@
 
   void loop() {
       LED_Control();
+      ToolSelect();
       SpindleSpeedOverRide();
       FeedOverRide();
       MPG_control_Select();
