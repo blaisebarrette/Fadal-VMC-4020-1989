@@ -3,7 +3,7 @@
 /********************************************/
 
 
-//while(loop) {
+    //while(loop) {
 /********************************************/
 /*          Get modus from slaves           */
 /********************************************/
@@ -11,12 +11,12 @@
     exec.GetModbusregisters(50, 9, out Slave_Master_array);
     ushort _MPG_Axis_Select = Slave_Master_array[0]; // 50
     ushort _MPG_Multiplication = Slave_Master_array[1]; // 51
-    ushort _Tool_Select = Slave_Master_array[2]; // 52
-    ushort _Tool_Select_watchdog = Slave_Master_array[3]; // 53
-    ushort _SpindleSpeedOverride = Slave_Master_array[4]; // 54
-    ushort _Spindle_Speed_Override_watchdog = Slave_Master_array[5]; // 55
-    ushort _FeedOverride = Slave_Master_array[6]; // 56
-    ushort _Feed_Override_watchdog = Slave_Master_array[7]; // 57
+    ushort _Tool_Select_Step = Slave_Master_array[2]; // 52 (Unused)
+    ushort _Tool_Select_Dir = Slave_Master_array[3]; // 53
+    ushort _Spindle_Speed_Override_Step = Slave_Master_array[4]; // 54 (Unused)
+    ushort _Spindle_Speed_Override_Dir = Slave_Master_array[5]; // 55
+    ushort _FeedOverride_Step = Slave_Master_array[6]; // 56 (Unused)
+    ushort _Feed_Override_dir = Slave_Master_array[7]; // 57
     ushort _ActivateToolChange = Slave_Master_array[8]; // 58
 
 /********************************************/
@@ -104,7 +104,6 @@
         }
 
     //---- Is Moving ----//
-
         // IsMoving Watchdog
         if(exec.IsMoving()){
             exec.SetModbusregister(12, 1);
@@ -112,82 +111,90 @@
             exec.SetModbusregister(12, 0);
         }
 
-    //---- Spindle Speed Override ----//
-        
-        // Change made in Control panel
-        if(_Spindle_Speed_Override_watchdog == 1){// Control panel watchdog signals a change
-            AS3.Setfield(_SpindleSpeedOverride,233); // insert value from register into UCCNC field
-            AS3.Validatefield(233); // Validate entry
-            exec.SetModbusregister(15, 2); // Confirm to Control Panel that message is recieved
-        }
-        if (_Spindle_Speed_Override_watchdog == 0){ //Whait for confirmation from Control panel
-            exec.SetModbusregister(15, 0); // All is equalised, set watchdog to sleep!
-        }
-
-        // Change made in UCCNC
-        ushort SpindleSpeedOverrideInUCCNCRegister; exec.GetModbusregister(16, out SpindleSpeedOverrideInUCCNCRegister);
-        string ValTemp3 = AS3.Getfield(233);
-        string ValTemp4 = ValTemp3.Substring(0, ValTemp3.Length-1);
-        ushort SpindleSpeedOverideInUCCNCField = Convert.ToUInt16(ValTemp4);
-        if(SpindleSpeedOverideInUCCNCField != SpindleSpeedOverrideInUCCNCRegister){
-            exec.SetModbusregister(16, SpindleSpeedOverideInUCCNCField); // Plave Value in register
-            exec.SetModbusregister(15, 1); // UCCNC watch dog sends signal to Control panel that someting has changed
-        }
-        if (_Spindle_Speed_Override_watchdog == 2){ //Whait for confirmation from Control panel that display has been updated
-            exec.SetModbusregister(15, 0); // All is equalised, set watchdog to sleep!
-        }
-
     //---- Tool select ----//
-        
-        // Change made in Control panel
-        if(_Tool_Select_watchdog == 1){// Control panel watchdog signals a change
-            AS3.Setfield(_Tool_Select,2652); // insert value from register into UCCNC field
+        string ToolTemp1 = AS3.Getfield(2652);
+        string ToolTemp2 = ToolTemp1.Substring(0, ToolTemp1.Length-1);
+        ushort ToolSelectInUCCNCField = Convert.ToUInt16(ToolTemp2);
+        bool ToolSelectChanged = false;
+
+        if(_Tool_Select_Dir == 1){ // Negative direction
+            AS3.Setfield((ToolSelectInUCCNCField - 10),2652); // Remove ten to current field value
             AS3.Validatefield(2652); // Validate entry
-            exec.SetModbusregister(13, 2); // Confirm to Control Panel that message is recieved
-        }
-        if (_Tool_Select_watchdog == 0){ //Whait for confirmation from Control panel
-            exec.SetModbusregister(13, 0); // All is equalised, set watchdog to sleep!
-        }
-        
-        // Change made in UCCNC
-        ushort ToolSelectInUCCNCRegister; exec.GetModbusregister(14, out ToolSelectInUCCNCRegister);
-        string ValTemp5 = AS3.Getfield(2652);
-        string ValTemp6 = ValTemp5.Substring(0, ValTemp5.Length-1);
-        ushort ToolSelectInUCCNCField = Convert.ToUInt16(ValTemp6);
-        if(ToolSelectInUCCNCField != ToolSelectInUCCNCRegister){
-            exec.SetModbusregister(14, ToolSelectInUCCNCField); // Place Value in register
-            exec.SetModbusregister(13, 1); // UCCNC watch dog sends signal to Control panel that someting has changed
-        }
-        if (_Tool_Select_watchdog == 2){ //Whait for confirmation from Control panel that display has been updated
-            exec.SetModbusregister(13, 0); // All is equalised, set watchdog to sleep!
+            ToolSelectChanged = true;
         }
 
-        if(_ActivateToolChange == 1){
-            exec.Callbutton(783);
+        if(_Tool_Select_Dir == 2){ // Positive direction
+            AS3.Setfield((ToolSelectInUCCNCField + 10),2652); // Adding ten to current field value
+            AS3.Validatefield(2652); // Validate entry
+            ToolSelectChanged = true;
+        }
+
+        if(_Tool_Select_Dir == 3){ // Encoder button clicked
+            exec.Callbutton(783); // Call the toolchage button
+            ToolSelectChanged = true;
+        }
+
+        if(ToolSelectChanged){
+            exec.SetModbusregister(53, 0); // Job's done!
+            ToolSelectChanged = false;
+        }
+
+    //---- Spindle Speed Override ----//
+        string Spindle1 = AS3.Getfield(233);
+        string Spindle2 = Spindle1.Substring(0, Spindle1.Length-1);
+        ushort SpindleSpeedOverideInUCCNCField = Convert.ToUInt16(Spindle2);
+        bool SpindleSpeedOverrideChanged = false;
+
+        if(_Spindle_Speed_Override_Dir == 1){ // Negative direction
+            AS3.Setfield((SpindleSpeedOverideInUCCNCField - 10),233); // Remove ten to current field value
+            AS3.Validatefield(233); // Validate entry
+            SpindleSpeedOverrideChanged = true;
+        }
+
+        if(_Spindle_Speed_Override_Dir == 2){ // Positive direction
+            AS3.Setfield((SpindleSpeedOverideInUCCNCField + 10),233); // Remove ten to current field value
+            AS3.Validatefield(233); // Validate entry
+            SpindleSpeedOverrideChanged = true;
+        }
+
+        if(_Spindle_Speed_Override_Dir == 3){ // Encoder button clicked
+            AS3.Setfield(100,233); // Set Spindle Speed Override to 100%
+            AS3.Validatefield(233); // Validate entry
+            SpindleSpeedOverrideChanged = true;
+        }
+
+        if(SpindleSpeedOverrideChanged){
+            exec.SetModbusregister(55, 0); // Job's done!
+            SpindleSpeedOverrideChanged = false;
         }
         
     //---- Feed Override ----//
-        // Change made in Control panel
-        if(_Feed_Override_watchdog == 1){// Control panel watchdog signals a change
-            AS3.Setfield(_FeedOverride,232); // insert value from register into UCCNC field
+        string Feed1 = AS3.Getfield(232);
+        string Feed2 = Feed1.Substring(0, Feed1.Length-1);
+        ushort FeedOverideInUCCNCField = Convert.ToUInt16(Feed2);
+        bool FeedOverrideChanged = false;
+
+        if(_Feed_Override_dir == 1){ // Negative direction
+            AS3.Setfield((FeedOverideInUCCNCField - 10),232); // Remove ten to current field value
             AS3.Validatefield(232); // Validate entry
-            exec.SetModbusregister(17, 2); // Confirm to Control Panel that message is recieved
-        }
-        if (_Feed_Override_watchdog == 0){ //Whait for confirmation from Control panel
-            exec.SetModbusregister(17, 0); // All is equalised, set watchdog to sleep!
+            FeedOverrideChanged = true;
         }
 
-        // Change made in UCCNC
-        ushort FeedOverrideInUCCNCRegister; exec.GetModbusregister(18, out FeedOverrideInUCCNCRegister);
-        string ValTemp1 = AS3.Getfield(232);
-        string ValTemp2 = ValTemp1.Substring(0, ValTemp1.Length-1);
-        ushort FeedOverideInUCCNCField = Convert.ToUInt16(ValTemp2);
-        if(FeedOverideInUCCNCField != FeedOverrideInUCCNCRegister){
-            exec.SetModbusregister(18, FeedOverideInUCCNCField); // Place Value in register
-            exec.SetModbusregister(17, 1); // UCCNC watch dog sends signal to Control panel that someting has changed
+        if(_Feed_Override_dir == 2){ // Positive direction
+            AS3.Setfield((FeedOverideInUCCNCField + 10),232); // Remove ten to current field value
+            AS3.Validatefield(232); // Validate entry
+            FeedOverrideChanged = true;
         }
-        if (_Feed_Override_watchdog == 2){ //Whait for confirmation from Control panel that display has been updated
-            exec.SetModbusregister(17, 0); // All is equalised, set watchdog to sleep!
+
+        if(_Feed_Override_dir == 3){ // Encoder button clicked
+            AS3.Setfield(100,232); // Set Feed Override to 100%
+            AS3.Validatefield(232); // Validate entry
+            FeedOverrideChanged = true;
+        }
+
+        if(FeedOverrideChanged){
+            exec.SetModbusregister(57, 0); // Job's done!
+            FeedOverrideChanged = false;
         }
 
     //---- Axis and scale select ----//

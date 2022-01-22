@@ -44,6 +44,12 @@
   
 /*################ Variables ################*/
   int E1prev, E2prev, E3prev, MPG_Axis_Select_val, MPG_Multiplicaton;
+  int E1current = 1;
+  int E2current = 100;
+  int E3current = 100;
+  bool ToolSelectChanged = false;
+  bool FeedOverrideChanged = false;
+  bool SpindleSpeedOverrideChanged = false;
   unsigned long currentMillis;
   unsigned long previousMillis = 0;
   bool isMoving = false;
@@ -120,58 +126,173 @@
       }
 
     //------------------- ToolSelect -------------------//
-      void ToolSelect() {
+      void ToolSelect() {  
+        if (digitalRead(tool_select_switch) == LOW) {
+          mb.Hreg(58, 1);
+        }else{
+          mb.Hreg(58, 0);
+        }
+        
         if (encoder1.getCountRaw() != E1prev) {
           if (encoder1.getCountRaw() < E1prev) {
-            //mb.Hreg(52, 1);
-            mb.Hreg(53, 1); // 1 = negative 2 = positive 3 = switch clicked
+            if (E1current > 0) {
+              E1current = E1current - 1;
+            }
+            if (E1current == 0) {
+              E1current = 21;
+            }
           }
           if (encoder1.getCountRaw() > E1prev) {
-            //mb.Hreg(52, 1);
-            mb.Hreg(53, 2); // 1 = negative 2 = positive 3 = switch clicked
+            if (E1current < 21) {
+              E1current = E1current + 1;
+            }
+            if (E1current == 22) {
+              E1current = 1;
+            }
           }
           E1prev = encoder1.getCountRaw();
+          ToolSelectChanged = true;
         }
-        if (digitalRead(tool_select_switch) == LOW) {
-          mb.Hreg(53, 3); // Activate tool change
+
+        // From Master to slave
+        // mb.addHreg(13);    // Tool Select Watchdog
+        // mb.addHreg(14);    // Tool Select UCCNC Value
+
+        // From slave to master
+        // mb.addHreg(52);    // Tool_Select
+        // mb.addHreg(53);    // Tool Select watchdog
+
+        // Change made in UCCNC
+        if(mb.Hreg(13) == 1){ // UCCNC watchdog signals a change
+          E1current = mb.Hreg(14); // Place value from UCCNC into Control Panel
+          mb.Hreg(53, 2); // Confirm to UCCNC that message is recieved
+          while (mb.Hreg(13) != 0){ //Wait for confirmation from UCCNC
+            mb.Hreg(52, mb.Hreg(14)); // Equalize Value in both registers
+            mb.task(); yield(); // Keep modbus engine running
+          }
+          mb.Hreg(53, 0); // All is equalised, set watchdog to sleep!
+        }
+
+        // Change made in Control Panel
+        if(ToolSelectChanged){ 
+          ToolSelectChanged = false;
+          mb.Hreg(53, 1); // Control panel watch dog sends signal to UCCNC that someting has changed
+          while (mb.Hreg(13) != 2){ //Whait for confirmation from UCCNC that fields have been updated
+            mb.Hreg(52, E1current); // Place new value from Control Panel in register
+            mb.task(); yield(); // Keep modbus engine running
+          }
+          mb.Hreg(53, 0); // All is equalised, set watchdog to sleep!
         }
       }
 
     //------------------- SpindleSpeedOverRide -------------------//
       void SpindleSpeedOverRide() {  
+        if (digitalRead(spindle_override_switch) == LOW) {
+          E2current = 100;
+          E2prev = encoder2.getCountRaw();
+          SpindleSpeedOverrideChanged = true;
+        }
+        
         if (encoder2.getCountRaw() != E2prev) {
           if (encoder2.getCountRaw() < E2prev) {
-            //mb.Hreg(54, 1);
-            mb.Hreg(55, 1); // 1 = negative 2 = positive 3 = switch clicked
+            if (E2current > 0) {
+              E2current = E2current - 10;
+            }
           }
           if (encoder2.getCountRaw() > E2prev) {
-            //mb.Hreg(54, 1);
-            mb.Hreg(55, 2); // 1 = negative 2 = positive 3 = switch clicked
+            if (E2current < 300) {
+              E2current = E2current + 10;
+            }
           }
           E2prev = encoder2.getCountRaw();
+          SpindleSpeedOverrideChanged = true;
         }
-        if (digitalRead(spindle_override_switch) == LOW) {
-          mb.Hreg(55, 3); // Set spindle speed override to 100%
+
+        // From Master to slave
+        // mb.addHreg(15);    // Spindle Speed Override Watchdog
+        // mb.addHreg(16);    // Spindle Speed Override UCCNC Value
+
+        // From slave to master
+        // mb.addHreg(54);    // Spindle Speed Override
+        // mb.addHreg(55);    // Spindle Speed Override watchdog
+
+        // Change made in UCCNC
+        if(mb.Hreg(15) == 1){ // UCCNC watchdog signals a change
+          E2current = mb.Hreg(16); // Place value from UCCNC into Control Panel
+          mb.Hreg(55, 2); // Confirm to UCCNC that message is recieved
+          while (mb.Hreg(15) != 0){ //Wait for confirmation from UCCNC
+            mb.Hreg(54, mb.Hreg(16)); // Equalize Value in both registers
+            mb.task(); yield(); // Keep modbus engine running
+          }
+          mb.Hreg(55, 0); // All is equalised, set watchdog to sleep!
+        }
+
+        // Change made in Control Panel
+        if(SpindleSpeedOverrideChanged){ 
+          SpindleSpeedOverrideChanged = false;
+          mb.Hreg(55, 1); // Control panel watch dog sends signal to UCCNC that someting has changed
+          while (mb.Hreg(15) != 2){ //Whait for confirmation from UCCNC that fields have been updated
+            mb.Hreg(54, E2current); // Place new value from Control Panel in register
+            mb.task(); yield(); // Keep modbus engine running
+          }
+          mb.Hreg(55, 0); // All is equalised, set watchdog to sleep!
         }
       }
 
     //------------------- FeedOverRide -------------------//
       void FeedOverRide() {
+        if (digitalRead(feed_override_switch) == LOW) {
+          E3current = 100;
+          E3prev = encoder3.getCountRaw();
+          FeedOverrideChanged = true;
+        }
+        
         if (encoder3.getCountRaw() != E3prev) {
           if (encoder3.getCountRaw() < E3prev) {
-            //mb.Hreg(56, 1);
-            mb.Hreg(57, 1); // 1 = negative 2 = positive 3 = switch clicked
+            if (E3current > 0) {
+              E3current = E3current - 10;
+            }
           }
           if (encoder3.getCountRaw() > E3prev) {
-            //mb.Hreg(56, 1);
-            mb.Hreg(57, 2); // 1 = negative 2 = positive 3 = switch clicked
+            if (E3current < 300) {
+              E3current = E3current + 10;
+            }
           }
           E3prev = encoder3.getCountRaw();
+          FeedOverrideChanged = true;
         }
-        if (digitalRead(feed_override_switch) == LOW) {
-          mb.Hreg(57, 3); // Set spindle speed override to 100%
+
+        // Master to slave
+        // mb.addHreg(17);    // Feed Override Watchdog
+        // mb.addHreg(18);    // Feed Override UCCNC Value
+
+        // Slave to master
+        // mb.addHreg(56);    // Feed Override
+        // mb.addHreg(57);    // Feed Override watchdog
+
+        // Change made in UCCNC
+        if(mb.Hreg(17) == 1){ // UCCNC watchdog signals a change
+          E3current = mb.Hreg(18); // Place value from UCCNC into Control Panel
+          mb.Hreg(57, 2); // Confirm to UCCNC that message is recieved
+          while (mb.Hreg(17) != 0){ //Whait for confirmation from UCCNC
+            mb.Hreg(56, mb.Hreg(18)); // Equalize Value in both registers
+            mb.task(); yield(); // Keep modbus engine running
+          }
+          mb.Hreg(57, 0); // All is equalised, set watchdog to sleep!
+        }
+
+        // Change made in Control Panel
+        if(FeedOverrideChanged){ 
+          FeedOverrideChanged = false;
+          mb.Hreg(57, 1); // Control panel watch dog sends signal to UCCNC that someting has changed
+          while (mb.Hreg(17) != 2){ //Whait for confirmation from UCCNC that fields have been updated
+            mb.Hreg(56, E3current); // Place new value from Control Panel in register
+            mb.task(); yield(); // Keep modbus engine running
+          }
+          mb.Hreg(57, 0); // All is equalised, set watchdog to sleep!
         }
       }
+
 
     //------------------- MPG_control_Select -------------------//
       int previous_MPG_Axis_Select_val, previous_MPG_Multiplicaton;
@@ -216,7 +337,7 @@
         unsigned long currentMillis = millis();
         if (currentMillis - previousMillis >= 250) {
           previousMillis = currentMillis;
-          Serial.printf("E1prev = %d E2prev = %d MPG_Axis_Select_val =  %d MPG_Multiplicaton = %d \n", E1prev, E2prev, MPG_Axis_Select_val, MPG_Multiplicaton);
+          Serial.printf("E1prev = %d E2prev = %d MPG_Axis_Select_val =  %d MPG_Multiplicaton = %d E1current = %d E2current = %d \n", E1prev, E2prev, MPG_Axis_Select_val, MPG_Multiplicaton, E1current, E2current);
         }
       }
 
@@ -269,16 +390,23 @@
       mb.addHreg(10);    // Lights ON/OFF LED
       mb.addHreg(11);    // Hard MPG Watchdog
       mb.addHreg(12);    // IsMoving Watchdog
+      mb.addHreg(13);    // Tool Select Watchdog
+      mb.addHreg(14);    // Tool Select UCCNC Value
+      mb.addHreg(15);    // Spindle Speed Override Watchdog
+      mb.addHreg(16);    // Spindle Speed Override UCCNC Value
+      mb.addHreg(17);    // Feed Override Watchdog
+      mb.addHreg(18);    // Feed Override UCCNC Value
       
     /*################ From slave to master ################*/
       mb.addHreg(50);    // MPG_Axis_Select
       mb.addHreg(51);    // MPG_Multiplicaton
-      mb.addHreg(52);    // Tool Select Step (Unused)
-      mb.addHreg(53);    // Tool Select Dir (1 = -, 2 = +, 3 = switch)
-      mb.addHreg(54);    // Spindle Speed Override Step (Unused)
-      mb.addHreg(55);    // Spindle Speed Override Dir (1 = -, 2 = +, 3 = switch)
-      mb.addHreg(56);    // Feed Override Step (Unused)
-      mb.addHreg(57);    // Feed Override Dir (1 = -, 2 = +, 3 = switch)
+      mb.addHreg(52);    // Tool_Select
+      mb.addHreg(53);    // Tool Select watchdog
+      mb.addHreg(54);    // Spindle Speed Override
+      mb.addHreg(55);    // Spindle Speed Override watchdog
+      mb.addHreg(56);    // Feed Override
+      mb.addHreg(57);    // Feed Override watchdog
+      mb.addHreg(58);    // Activate tool change
 
 
     // Serial debug. Runs only if variable "Debuging_Mode" is set to true //

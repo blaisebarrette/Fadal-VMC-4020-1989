@@ -1,0 +1,207 @@
+/********************************************/
+/*    Persistent variables declared here    */
+/********************************************/
+
+
+//while(loop) {
+/********************************************/
+/*          Get modus from slaves           */
+/********************************************/
+    ushort[] Slave_Master_array = new ushort[9];
+    exec.GetModbusregisters(50, 9, out Slave_Master_array);
+    ushort _MPG_Axis_Select = Slave_Master_array[0]; // 50
+    ushort _MPG_Multiplication = Slave_Master_array[1]; // 51
+    ushort _Tool_Select = Slave_Master_array[2]; // 52
+    ushort _Tool_Select_watchdog = Slave_Master_array[3]; // 53
+    ushort _SpindleSpeedOverride = Slave_Master_array[4]; // 54
+    ushort _Spindle_Speed_Override_watchdog = Slave_Master_array[5]; // 55
+    ushort _FeedOverride = Slave_Master_array[6]; // 56
+    ushort _Feed_Override_watchdog = Slave_Master_array[7]; // 57
+    ushort _ActivateToolChange = Slave_Master_array[8]; // 58
+
+/********************************************/
+/*           Send modus to slaves           */
+/********************************************/
+    //---- LED ----//
+        // Probe Tool LED
+        exec.SetModbusregister(0, 0);
+
+        // Table Front LED
+        //exec.SetModbusregister(1, 0); // Handled in macro M200 (Go to park position 1)
+
+        // Home Machine LED
+        if(AS3.GetLED(23) == true){
+            exec.SetModbusregister(2, 1);
+        }else{
+            exec.SetModbusregister(2, 0);
+        }
+
+        // Reset LED
+        if(AS3.GetLED(25) == true){ 
+            exec.SetModbusregister(3, 1);
+        }else{
+            exec.SetModbusregister(3, 0);
+        }
+
+        // Spindle ON/OFF LED
+        if(AS3.GetLED(50) == true || AS3.GetLED(51) == true){
+            exec.SetModbusregister(4, 1);
+        }else{
+            exec.SetModbusregister(4, 0);
+        }
+
+        // Coolant ON/OFF LED
+        if(AS3.GetLED(53) == true){
+            exec.SetModbusregister(5, 1);
+        }else{
+            exec.SetModbusregister(5, 0);
+        }
+
+        // Mist ON/OFF LED
+        if(AS3.GetLED(52) == true){
+            exec.SetModbusregister(6, 1);
+        }else{
+            exec.SetModbusregister(6, 0);
+        }
+
+        // Chip Auger ON/OFF LED
+        exec.SetModbusregister(7, 0);
+        
+        // Optional Stop LED
+        if(AS3.Getbuttonstate(561) == true){
+            exec.SetModbusregister(8, 1);
+        }else{
+            exec.SetModbusregister(8, 0);
+        }
+
+        // Single Line LED
+        if(AS3.GetLED(55) == true){
+            exec.SetModbusregister(9, 1);
+        }else{
+            exec.SetModbusregister(9, 0);
+        }
+
+        // Lights ON/OFF LED
+        exec.SetModbusregister(10, 0);
+        
+
+    //---- MPG state ----//
+        ushort HardMPG = 0;
+        if(AS3jog.Getbuttonstate(161) == true || AS3jog.Getbuttonstate(162) == true || exec.IsMoving()){
+            HardMPG = 0;
+        }else{
+            HardMPG = 1;
+        }
+
+        if((AS3.GetLED(137) == false || AS3.GetLED(138) == false) && (AS3jog.Getbuttonstate(226) != true && AS3jog.Getbuttonstate(227) != true) && (AS3.GetLED(23) != true)){ // Watch MPG LED in "Diagnostic" page
+            exec.Callbutton(228); // Acivate "MPG Multi" Button
+        }
+
+        if(HardMPG == 1){
+            exec.SetModbusregister(11, 1);
+        }else{
+            exec.SetModbusregister(11, 0);
+        }
+
+    //---- Is Moving ----//
+
+        // IsMoving Watchdog
+        if(exec.IsMoving()){
+            exec.SetModbusregister(12, 1);
+        }else{
+            exec.SetModbusregister(12, 0);
+        }
+
+    //---- Spindle Speed Override ----//
+        
+        // Change made in Control panel
+        if(_Spindle_Speed_Override_watchdog == 1){// Control panel watchdog signals a change
+            AS3.Setfield(_SpindleSpeedOverride,233); // insert value from register into UCCNC field
+            AS3.Validatefield(233); // Validate entry
+            exec.SetModbusregister(15, 2); // Confirm to Control Panel that message is recieved
+        }
+        if (_Spindle_Speed_Override_watchdog == 0){ //Whait for confirmation from Control panel
+            exec.SetModbusregister(15, 0); // All is equalised, set watchdog to sleep!
+        }
+
+        // Change made in UCCNC
+        ushort SpindleSpeedOverrideInUCCNCRegister; exec.GetModbusregister(16, out SpindleSpeedOverrideInUCCNCRegister);
+        string ValTemp3 = AS3.Getfield(233);
+        string ValTemp4 = ValTemp3.Substring(0, ValTemp3.Length-1);
+        ushort SpindleSpeedOverideInUCCNCField = Convert.ToUInt16(ValTemp4);
+        if(SpindleSpeedOverideInUCCNCField != SpindleSpeedOverrideInUCCNCRegister){
+            exec.SetModbusregister(16, SpindleSpeedOverideInUCCNCField); // Plave Value in register
+            exec.SetModbusregister(15, 1); // UCCNC watch dog sends signal to Control panel that someting has changed
+        }
+        if (_Spindle_Speed_Override_watchdog == 2){ //Whait for confirmation from Control panel that display has been updated
+            exec.SetModbusregister(15, 0); // All is equalised, set watchdog to sleep!
+        }
+
+    //---- Tool select ----//
+        
+        // Change made in Control panel
+        if(_Tool_Select_watchdog == 1){// Control panel watchdog signals a change
+            AS3.Setfield(_Tool_Select,2652); // insert value from register into UCCNC field
+            AS3.Validatefield(2652); // Validate entry
+            exec.SetModbusregister(13, 2); // Confirm to Control Panel that message is recieved
+        }
+        if (_Tool_Select_watchdog == 0){ //Whait for confirmation from Control panel
+            exec.SetModbusregister(13, 0); // All is equalised, set watchdog to sleep!
+        }
+        
+        // Change made in UCCNC
+        ushort ToolSelectInUCCNCRegister; exec.GetModbusregister(14, out ToolSelectInUCCNCRegister);
+        string ValTemp5 = AS3.Getfield(2652);
+        string ValTemp6 = ValTemp5.Substring(0, ValTemp5.Length-1);
+        ushort ToolSelectInUCCNCField = Convert.ToUInt16(ValTemp6);
+        if(ToolSelectInUCCNCField != ToolSelectInUCCNCRegister){
+            exec.SetModbusregister(14, ToolSelectInUCCNCField); // Place Value in register
+            exec.SetModbusregister(13, 1); // UCCNC watch dog sends signal to Control panel that someting has changed
+        }
+        if (_Tool_Select_watchdog == 2){ //Whait for confirmation from Control panel that display has been updated
+            exec.SetModbusregister(13, 0); // All is equalised, set watchdog to sleep!
+        }
+
+        if(_ActivateToolChange == 1){
+            exec.Callbutton(783);
+        }
+        
+    //---- Feed Override ----//
+        // Change made in Control panel
+        if(_Feed_Override_watchdog == 1){// Control panel watchdog signals a change
+            AS3.Setfield(_FeedOverride,232); // insert value from register into UCCNC field
+            AS3.Validatefield(232); // Validate entry
+            exec.SetModbusregister(17, 2); // Confirm to Control Panel that message is recieved
+        }
+        if (_Feed_Override_watchdog == 0){ //Whait for confirmation from Control panel
+            exec.SetModbusregister(17, 0); // All is equalised, set watchdog to sleep!
+        }
+
+        // Change made in UCCNC
+        ushort FeedOverrideInUCCNCRegister; exec.GetModbusregister(18, out FeedOverrideInUCCNCRegister);
+        string ValTemp1 = AS3.Getfield(232);
+        string ValTemp2 = ValTemp1.Substring(0, ValTemp1.Length-1);
+        ushort FeedOverideInUCCNCField = Convert.ToUInt16(ValTemp2);
+        if(FeedOverideInUCCNCField != FeedOverrideInUCCNCRegister){
+            exec.SetModbusregister(18, FeedOverideInUCCNCField); // Place Value in register
+            exec.SetModbusregister(17, 1); // UCCNC watch dog sends signal to Control panel that someting has changed
+        }
+        if (_Feed_Override_watchdog == 2){ //Whait for confirmation from Control panel that display has been updated
+            exec.SetModbusregister(17, 0); // All is equalised, set watchdog to sleep!
+        }
+
+    //---- Axis and scale select ----//
+        if(HardMPG == 1){ // If Hard MPG is selected
+            if(_MPG_Axis_Select == 1){exec.Callbutton(220);}
+            if(_MPG_Axis_Select == 2){exec.Callbutton(221);}
+            if(_MPG_Axis_Select == 3){exec.Callbutton(222);}
+            if(_MPG_Axis_Select == 4){exec.Callbutton(225);}
+            if(_MPG_Multiplication == 1){exec.Callbutton(20000);}
+            if(_MPG_Multiplication == 2){exec.Callbutton(241);}
+            if(_MPG_Multiplication == 3){exec.Callbutton(164);}
+            if(_MPG_Multiplication == 4){exec.Callbutton(165);}
+        }
+    
+        if((AS3jog.Getbuttonstate(241) == true) || (AS3jog.Getbuttonstate(164) == true) || (AS3jog.Getbuttonstate(165) == true)){AS3jog.Switchbutton(false, 20000);}
+    //Thread.Sleep(50);
+//}
