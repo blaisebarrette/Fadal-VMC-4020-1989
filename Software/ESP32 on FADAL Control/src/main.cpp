@@ -43,7 +43,7 @@
   ESP32Encoder encoder3; // Feedrate Override encoder //
   
 /*################ Variables ################*/
-  int E1prev, E2prev, E3prev, MPG_Axis_Select_val, MPG_Multiplicaton,PreviousToolSelectOnModbus, PreviousSpindleSpeedOnModbus, PreviousFeedOnModbus;
+  int E1prev, E2prev, E3prev, MPG_Axis_Select_val, MPG_Multiplicaton,PreviousToolSelectOnModbus, PreviousSpindleSpeedOnModbus, PreviousFeedOnModbus, PreviousPulley;
   unsigned long currentMillis;
   unsigned long previousMillis = 0;
   bool isMoving = false;
@@ -153,38 +153,36 @@
 
     //------------------- SpindleSpeedOverRide -------------------//
 
-      bool TestforMaxAndMinPerimitedOverride(){
-        int pulleyRatio = mb.Hreg(16);
+      int CalculateOverride(){
         int CommandedSpindleSpeed = mb.Hreg(17);
         int calculatedSpeed = CommandedSpindleSpeed * SpindleSpeedOverrideValue / 100;
-        bool answer = false;
-        if(pulleyRatio == 1 && calculatedSpeed <= 2500){
-          answer = true;
-        }
-        if(pulleyRatio == 2 && calculatedSpeed > 2500){
-          answer = true;
-        }
-        return answer;
+        return calculatedSpeed;
       }
 
-      void SpindleSpeedOverRide(){  
-
+      void SpindleSpeedOverRide(){ 
+        int pulleyRatio = mb.Hreg(16); 
+        if(PreviousPulley != pulleyRatio){
+          PreviousPulley = pulleyRatio;
+          SpindleSpeedOverrideValue = 100;
+          mb.Hreg(55, SpindleSpeedOverrideValue);
+        }
+        
         if (encoder2.getCountRaw() != E2prev){
           if (encoder2.getCountRaw() < E2prev){
             if(SpindleSpeedOverrideValue > 0){
-              SpindleSpeedOverrideValue = SpindleSpeedOverrideValue - 10;
+              if(pulleyRatio == 1 || (pulleyRatio == 2 && CalculateOverride() > 2500)){
+                SpindleSpeedOverrideValue = SpindleSpeedOverrideValue - 10;
+              }
             }
           }
           if (encoder2.getCountRaw() > E2prev){
             if(SpindleSpeedOverrideValue < 300){
+              if(pulleyRatio == 2 || (pulleyRatio == 1 && CalculateOverride() <= 2500))
               SpindleSpeedOverrideValue = SpindleSpeedOverrideValue + 10;
             }
           }
           E2prev = encoder2.getCountRaw();
-          if(TestforMaxAndMinPerimitedOverride()){
-            mb.Hreg(55, SpindleSpeedOverrideValue);
-          }
-          
+          mb.Hreg(55, SpindleSpeedOverrideValue);
         }
         if (digitalRead(spindle_override_switch) == LOW){
           SpindleSpeedOverrideValue = 100;
@@ -336,6 +334,7 @@
       PreviousToolSelectOnModbus = mb.Hreg(13);
       PreviousSpindleSpeedOnModbus = mb.Hreg(14);
       PreviousFeedOnModbus = mb.Hreg(15);
+      PreviousPulley = mb.Hreg(16);
       
     /*################ From slave to master ################*/
       mb.addHreg(50);    // MPG_Axis_Select
