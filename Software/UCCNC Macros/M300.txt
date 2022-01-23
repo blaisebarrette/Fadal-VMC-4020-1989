@@ -137,7 +137,7 @@
         bool SSOalteredFromUCCNC = false;
 
         if(AS3.Getbutton(134) || AS3.Getbutton(135) || AS3.Getbutton(558)){
-            if((CurrentPulley == 1 && SSO_Overiden < 2500) || (CurrentPulley == 2 && (SSO_Overiden > 2500 && SSO_Overiden < 10000))){
+            if((CurrentPulley == 1 && SSO_Overiden < 2500) || (CurrentPulley == 2 && SSO_Overiden > 2500)){
                 exec.SetModbusregister(14, SpindleSpeedOverideInUCCNCField);
                 SSOalteredFromUCCNC = true;
                 ushort SSOWaitForUpdate = 0;

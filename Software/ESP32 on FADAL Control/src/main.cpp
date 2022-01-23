@@ -157,12 +157,12 @@
         int pulleyRatio = mb.Hreg(16);
         int CommandedSpindleSpeed = mb.Hreg(17);
         int calculatedSpeed = CommandedSpindleSpeed * SpindleSpeedOverrideValue / 100;
-        bool answer = true;
-        if(pulleyRatio == 1 && calculatedSpeed > 2500){
-          answer = false;
+        bool answer = false;
+        if(pulleyRatio == 1 && calculatedSpeed <= 2500){
+          answer = true;
         }
-        if(pulleyRatio == 2 && (calculatedSpeed < 2500 || calculatedSpeed > 10000)){
-          answer = false;
+        if(pulleyRatio == 2 && calculatedSpeed > 2500){
+          answer = true;
         }
         return answer;
       }
