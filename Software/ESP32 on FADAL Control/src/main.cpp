@@ -43,11 +43,14 @@
   ESP32Encoder encoder3; // Feedrate Override encoder //
   
 /*################ Variables ################*/
-  int E1prev, E2prev, E3prev, MPG_Axis_Select_val, MPG_Multiplicaton;
+  int E1prev, E2prev, E3prev, MPG_Axis_Select_val, MPG_Multiplicaton,PreviousToolSelectOnModbus, PreviousSpindleSpeedOnModbus, PreviousFeedOnModbus;
   unsigned long currentMillis;
   unsigned long previousMillis = 0;
   bool isMoving = false;
   bool Debuging_Mode = false;
+  int ToolSelectValue = 1;
+  int SpindleSpeedOverrideValue = 100;
+  int FeedOverrideValue = 100;
 
 /*################ Functions ################*/
     //------------------- LED control -------------------//
@@ -123,35 +126,57 @@
       void ToolSelect() {
         if (encoder1.getCountRaw() != E1prev) {
           if (encoder1.getCountRaw() < E1prev) {
-            //mb.Hreg(52, 1);
-            mb.Hreg(53, 1); // 1 = negative 2 = positive 3 = switch clicked
+            if(ToolSelectValue > 0){ToolSelectValue = ToolSelectValue - 1;}
+            if(ToolSelectValue == 0){ToolSelectValue = 21;}
           }
           if (encoder1.getCountRaw() > E1prev) {
-            //mb.Hreg(52, 1);
-            mb.Hreg(53, 2); // 1 = negative 2 = positive 3 = switch clicked
+            if(ToolSelectValue <= 21){ToolSelectValue = ToolSelectValue + 1;}
+            if(ToolSelectValue == 22){ToolSelectValue = 1;}
           }
           E1prev = encoder1.getCountRaw();
+          mb.Hreg(53, ToolSelectValue);
         }
+        
         if (digitalRead(tool_select_switch) == LOW) {
-          mb.Hreg(53, 3); // Activate tool change
+          mb.Hreg(52, 1); // Activate tool change
+        }else{
+          mb.Hreg(52, 0); // Activate tool change
         }
+
+        // Look for a change fromm UCCNC
+        //if(PreviousToolSelectOnModbus != mb.Hreg(13)){
+          //ToolSelectValue = PreviousToolSelectOnModbus;
+          //mb.Hreg(53, ToolSelectValue);
+          //PreviousToolSelectOnModbus = mb.Hreg(13);
+        //}
       }
 
     //------------------- SpindleSpeedOverRide -------------------//
       void SpindleSpeedOverRide() {  
         if (encoder2.getCountRaw() != E2prev) {
           if (encoder2.getCountRaw() < E2prev) {
-            //mb.Hreg(54, 1);
-            mb.Hreg(55, 1); // 1 = negative 2 = positive 3 = switch clicked
+            if(SpindleSpeedOverrideValue > 0){
+              SpindleSpeedOverrideValue = SpindleSpeedOverrideValue - 10;
+            }
           }
           if (encoder2.getCountRaw() > E2prev) {
-            //mb.Hreg(54, 1);
-            mb.Hreg(55, 2); // 1 = negative 2 = positive 3 = switch clicked
+            if(SpindleSpeedOverrideValue < 300){
+              SpindleSpeedOverrideValue = SpindleSpeedOverrideValue + 10;
+            }
           }
           E2prev = encoder2.getCountRaw();
+          mb.Hreg(55, SpindleSpeedOverrideValue);
         }
         if (digitalRead(spindle_override_switch) == LOW) {
-          mb.Hreg(55, 3); // Set spindle speed override to 100%
+          SpindleSpeedOverrideValue = 100;
+          mb.Hreg(55, SpindleSpeedOverrideValue);
+        }
+
+        // Look for a change fromm UCCNC
+        if(PreviousSpindleSpeedOnModbus != mb.Hreg(14)){
+          SpindleSpeedOverrideValue = PreviousSpindleSpeedOnModbus;
+          mb.Hreg(55, SpindleSpeedOverrideValue);
+          PreviousSpindleSpeedOnModbus = mb.Hreg(14);
         }
       }
 
@@ -159,18 +184,30 @@
       void FeedOverRide() {
         if (encoder3.getCountRaw() != E3prev) {
           if (encoder3.getCountRaw() < E3prev) {
-            //mb.Hreg(56, 1);
-            mb.Hreg(57, 1); // 1 = negative 2 = positive 3 = switch clicked
+            if(FeedOverrideValue > 0){
+              FeedOverrideValue = FeedOverrideValue - 10;
+            }
           }
           if (encoder3.getCountRaw() > E3prev) {
-            //mb.Hreg(56, 1);
-            mb.Hreg(57, 2); // 1 = negative 2 = positive 3 = switch clicked
+            if(FeedOverrideValue < 300){
+              FeedOverrideValue = FeedOverrideValue + 10;
+            }
           }
           E3prev = encoder3.getCountRaw();
+          mb.Hreg(57, FeedOverrideValue);
         }
         if (digitalRead(feed_override_switch) == LOW) {
-          mb.Hreg(57, 3); // Set spindle speed override to 100%
+          FeedOverrideValue = 100;
+          mb.Hreg(57, FeedOverrideValue);
         }
+
+        // Look for a change fromm UCCNC
+        if(PreviousFeedOnModbus != mb.Hreg(15)){
+          FeedOverrideValue = PreviousFeedOnModbus;
+          mb.Hreg(57, FeedOverrideValue);
+          PreviousFeedOnModbus = mb.Hreg(15);
+        }
+
       }
 
     //------------------- MPG_control_Select -------------------//
@@ -269,11 +306,18 @@
       mb.addHreg(10);    // Lights ON/OFF LED
       mb.addHreg(11);    // Hard MPG Watchdog
       mb.addHreg(12);    // IsMoving Watchdog
+      mb.addHreg(13);    // Tool select changed on UCCNC
+      mb.addHreg(14);    // Spindle Speed Override changed on UCCNC
+      mb.addHreg(15);    // Feed Override changed on UCCNC
+      
+      PreviousToolSelectOnModbus = mb.Hreg(13);
+      PreviousSpindleSpeedOnModbus = mb.Hreg(14);
+      PreviousFeedOnModbus = mb.Hreg(15);
       
     /*################ From slave to master ################*/
       mb.addHreg(50);    // MPG_Axis_Select
       mb.addHreg(51);    // MPG_Multiplicaton
-      mb.addHreg(52);    // Tool Select Step (Unused)
+      mb.addHreg(52);    // Tool Select Switch
       mb.addHreg(53);    // Tool Select Dir (1 = -, 2 = +, 3 = switch)
       mb.addHreg(54);    // Spindle Speed Override Step (Unused)
       mb.addHreg(55);    // Spindle Speed Override Dir (1 = -, 2 = +, 3 = switch)
