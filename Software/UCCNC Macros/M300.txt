@@ -131,9 +131,13 @@
         ushort SpindleSpeedOverideInUCCNCField = Convert.ToUInt16(Spindle2);
         bool SSOalteredFromUCCNC = false;
 
-        if(AS3.Getbutton(134) || AS3.Getbutton(135)){
+        if(AS3.Getbutton(134) || AS3.Getbutton(135) || AS3.Getbutton(558)){
             exec.SetModbusregister(14, SpindleSpeedOverideInUCCNCField);
             SSOalteredFromUCCNC = true;
+            ushort SSOWaitForUpdate = 0;
+            while(SSOWaitForUpdate != SpindleSpeedOverideInUCCNCField){
+                exec.GetModbusregister(55, out SSOWaitForUpdate);
+            }
         }
 
         if(_Spindle_Speed_Override != SpindleSpeedOverideInUCCNCField && !SSOalteredFromUCCNC){
@@ -146,10 +150,14 @@
         string Feed2 = Feed1.Substring(0, Feed1.Length-1);
         ushort FeedOverideInUCCNCField = Convert.ToUInt16(Feed2);
         bool FROalteredFromUCCNC = false;
-
-        if(AS3.Getbutton(132) || AS3.Getbutton(133)){
+        
+        if(AS3.Getbutton(132) || AS3.Getbutton(133) || AS3.Getbutton(557)){
             exec.SetModbusregister(15, FeedOverideInUCCNCField);
             FROalteredFromUCCNC = true;
+            ushort FROWaitForUpdate = 0;
+            while(FROWaitForUpdate != FeedOverideInUCCNCField){
+                exec.GetModbusregister(57, out FROWaitForUpdate);
+            }
         }
 
         if(_Feed_Override != FeedOverideInUCCNCField && !FROalteredFromUCCNC){ // Negative direction

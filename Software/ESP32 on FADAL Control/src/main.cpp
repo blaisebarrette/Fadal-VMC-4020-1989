@@ -152,14 +152,14 @@
       }
 
     //------------------- SpindleSpeedOverRide -------------------//
-      void SpindleSpeedOverRide() {  
-        if (encoder2.getCountRaw() != E2prev) {
-          if (encoder2.getCountRaw() < E2prev) {
+      void SpindleSpeedOverRide(){  
+        if (encoder2.getCountRaw() != E2prev){
+          if (encoder2.getCountRaw() < E2prev){
             if(SpindleSpeedOverrideValue > 0){
               SpindleSpeedOverrideValue = SpindleSpeedOverrideValue - 10;
             }
           }
-          if (encoder2.getCountRaw() > E2prev) {
+          if (encoder2.getCountRaw() > E2prev){
             if(SpindleSpeedOverrideValue < 300){
               SpindleSpeedOverrideValue = SpindleSpeedOverrideValue + 10;
             }
@@ -167,16 +167,17 @@
           E2prev = encoder2.getCountRaw();
           mb.Hreg(55, SpindleSpeedOverrideValue);
         }
-        if (digitalRead(spindle_override_switch) == LOW) {
+        if (digitalRead(spindle_override_switch) == LOW){
           SpindleSpeedOverrideValue = 100;
           mb.Hreg(55, SpindleSpeedOverrideValue);
         }
 
         // Look for a change fromm UCCNC
-        if(PreviousSpindleSpeedOnModbus != mb.Hreg(14)){
-          SpindleSpeedOverrideValue = PreviousSpindleSpeedOnModbus;
+        int NewSSOValiewFromUCCNC = mb.Hreg(14);
+        if(PreviousSpindleSpeedOnModbus != NewSSOValiewFromUCCNC){
+          SpindleSpeedOverrideValue = NewSSOValiewFromUCCNC;
           mb.Hreg(55, SpindleSpeedOverrideValue);
-          PreviousSpindleSpeedOnModbus = mb.Hreg(14);
+          PreviousSpindleSpeedOnModbus = NewSSOValiewFromUCCNC;
         }
       }
 
@@ -202,10 +203,11 @@
         }
 
         // Look for a change fromm UCCNC
-        if(PreviousFeedOnModbus != mb.Hreg(15)){
-          FeedOverrideValue = PreviousFeedOnModbus;
+        int FROValueFromUCCNC = mb.Hreg(15);
+        if(PreviousFeedOnModbus != FROValueFromUCCNC){
+          FeedOverrideValue = FROValueFromUCCNC;
           mb.Hreg(57, FeedOverrideValue);
-          PreviousFeedOnModbus = mb.Hreg(15);
+          PreviousFeedOnModbus = FROValueFromUCCNC;
         }
 
       }
