@@ -112,7 +112,7 @@
         }
 
     //---- Tool select ----//
-        string ToolTemp1 = AS3.Getfield(2652);
+        /*string ToolTemp1 = AS3.Getfield(2652);
         string ToolTemp2 = ToolTemp1.Substring(0, ToolTemp1.Length-1);
         ushort ToolSelectInUCCNCField = Convert.ToUInt16(ToolTemp2);
 
@@ -123,20 +123,27 @@
 
         if(_Tool_Select_Switch == 1){
             exec.Callbutton(783); // Click the tool change button
-        }
+        }*/
 
     //---- Spindle Speed Override ----//
-        string Spindle1 = AS3.Getfield(233);
-        string Spindle2 = Spindle1.Substring(0, Spindle1.Length-1);
-        ushort SpindleSpeedOverideInUCCNCField = Convert.ToUInt16(Spindle2);
+
+        string S_SpindleSpeedOverideInUCCNCField = AS3.Getfield(233);
+        S_SpindleSpeedOverideInUCCNCField = S_SpindleSpeedOverideInUCCNCField.Substring(0, S_SpindleSpeedOverideInUCCNCField.Length-1);
+        ushort SpindleSpeedOverideInUCCNCField = Convert.ToUInt16(S_SpindleSpeedOverideInUCCNCField);
+        string S_CurrentPulley = AS3.Getfield(2013);
+        ushort CurrentPulley = Convert.ToUInt16(S_CurrentPulley);
+        exec.SetModbusregister(16, CurrentPulley);
+        float SSO_Overiden = float.Parse(AS3.Getfield(2451));
         bool SSOalteredFromUCCNC = false;
 
         if(AS3.Getbutton(134) || AS3.Getbutton(135) || AS3.Getbutton(558)){
-            exec.SetModbusregister(14, SpindleSpeedOverideInUCCNCField);
-            SSOalteredFromUCCNC = true;
-            ushort SSOWaitForUpdate = 0;
-            while(SSOWaitForUpdate != SpindleSpeedOverideInUCCNCField){
-                exec.GetModbusregister(55, out SSOWaitForUpdate);
+            if((CurrentPulley == 1 && SSO_Overiden < 2500) || (CurrentPulley == 2 && (SSO_Overiden > 2500 && SSO_Overiden < 10000))){
+                exec.SetModbusregister(14, SpindleSpeedOverideInUCCNCField);
+                SSOalteredFromUCCNC = true;
+                ushort SSOWaitForUpdate = 0;
+                while(SSOWaitForUpdate != SpindleSpeedOverideInUCCNCField){
+                    exec.GetModbusregister(55, out SSOWaitForUpdate);
+                }
             }
         }
 
@@ -146,9 +153,9 @@
         }
 
     //---- Feed Override ----//
-        string Feed1 = AS3.Getfield(232);
-        string Feed2 = Feed1.Substring(0, Feed1.Length-1);
-        ushort FeedOverideInUCCNCField = Convert.ToUInt16(Feed2);
+        string S_FeedOverideInUCCNCField = AS3.Getfield(232);
+        S_FeedOverideInUCCNCField = S_FeedOverideInUCCNCField.Substring(0, S_FeedOverideInUCCNCField.Length-1);
+        ushort FeedOverideInUCCNCField = Convert.ToUInt16(S_FeedOverideInUCCNCField);
         bool FROalteredFromUCCNC = false;
         
         if(AS3.Getbutton(132) || AS3.Getbutton(133) || AS3.Getbutton(557)){

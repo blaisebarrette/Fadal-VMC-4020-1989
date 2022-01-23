@@ -152,7 +152,23 @@
       }
 
     //------------------- SpindleSpeedOverRide -------------------//
+
+      bool TestforMaxAndMinPerimitedOverride(){
+        int pulleyRatio = mb.Hreg(16);
+        int CommandedSpindleSpeed = mb.Hreg(17);
+        int calculatedSpeed = CommandedSpindleSpeed * SpindleSpeedOverrideValue / 100;
+        bool answer = true;
+        if(pulleyRatio == 1 && calculatedSpeed > 2500){
+          answer = false;
+        }
+        if(pulleyRatio == 2 && (calculatedSpeed < 2500 || calculatedSpeed > 10000)){
+          answer = false;
+        }
+        return answer;
+      }
+
       void SpindleSpeedOverRide(){  
+
         if (encoder2.getCountRaw() != E2prev){
           if (encoder2.getCountRaw() < E2prev){
             if(SpindleSpeedOverrideValue > 0){
@@ -165,7 +181,10 @@
             }
           }
           E2prev = encoder2.getCountRaw();
-          mb.Hreg(55, SpindleSpeedOverrideValue);
+          if(TestforMaxAndMinPerimitedOverride()){
+            mb.Hreg(55, SpindleSpeedOverrideValue);
+          }
+          
         }
         if (digitalRead(spindle_override_switch) == LOW){
           SpindleSpeedOverrideValue = 100;
@@ -311,6 +330,8 @@
       mb.addHreg(13);    // Tool select changed on UCCNC
       mb.addHreg(14);    // Spindle Speed Override changed on UCCNC
       mb.addHreg(15);    // Feed Override changed on UCCNC
+      mb.addHreg(16);    // Currently selected pulley
+      mb.addHreg(17);    // Setspindlespeed
       
       PreviousToolSelectOnModbus = mb.Hreg(13);
       PreviousSpindleSpeedOnModbus = mb.Hreg(14);
@@ -320,12 +341,14 @@
       mb.addHreg(50);    // MPG_Axis_Select
       mb.addHreg(51);    // MPG_Multiplicaton
       mb.addHreg(52);    // Tool Select Switch
-      mb.addHreg(53);    // Tool Select Dir (1 = -, 2 = +, 3 = switch)
+      mb.addHreg(53);    // Tool Select
       mb.addHreg(54);    // Spindle Speed Override Step (Unused)
-      mb.addHreg(55);    // Spindle Speed Override Dir (1 = -, 2 = +, 3 = switch)
+      mb.addHreg(55);    // Spindle Speed Override
       mb.addHreg(56);    // Feed Override Step (Unused)
-      mb.addHreg(57);    // Feed Override Dir (1 = -, 2 = +, 3 = switch)
+      mb.addHreg(57);    // Feed Override
 
+      mb.Hreg(55, 100); // initially set the value to 100% on modbus
+      mb.Hreg(57, 100); // initially set the value to 100% on modbus
 
     // Serial debug. Runs only if variable "Debuging_Mode" is set to true //
       if (Debuging_Mode) {
