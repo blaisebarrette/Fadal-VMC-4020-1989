@@ -153,13 +153,13 @@
 
     //------------------- SpindleSpeedOverRide -------------------//
 
-      int CalculateOverride(){
+      /*int CalculateOverride(){
         int CommandedSpindleSpeed = mb.Hreg(17);
         int calculatedSpeed = CommandedSpindleSpeed * SpindleSpeedOverrideValue / 100;
         return calculatedSpeed;
-      }
+      }*/
 
-      void SpindleSpeedOverRide(){ 
+      void SpindleSpeedOverRide(){
         int pulleyRatio = mb.Hreg(16); 
         if(PreviousPulley != pulleyRatio){
           PreviousPulley = pulleyRatio;
@@ -170,15 +170,16 @@
         if (encoder2.getCountRaw() != E2prev){
           if (encoder2.getCountRaw() < E2prev){
             if(SpindleSpeedOverrideValue > 0){
-              if(pulleyRatio == 1 || (pulleyRatio == 2 && CalculateOverride() > 2500)){
+              //if(pulleyRatio == 1 || (pulleyRatio == 2 && CalculateOverride() > 2500)){
                 SpindleSpeedOverrideValue = SpindleSpeedOverrideValue - 10;
-              }
+              //}
             }
           }
           if (encoder2.getCountRaw() > E2prev){
             if(SpindleSpeedOverrideValue < 300){
-              if(pulleyRatio == 2 || (pulleyRatio == 1 && CalculateOverride() <= 2500))
-              SpindleSpeedOverrideValue = SpindleSpeedOverrideValue + 10;
+              //if(pulleyRatio == 2 || (pulleyRatio == 1 && CalculateOverride() <= 2500))
+                SpindleSpeedOverrideValue = SpindleSpeedOverrideValue + 10;
+              //}
             }
           }
           E2prev = encoder2.getCountRaw();
