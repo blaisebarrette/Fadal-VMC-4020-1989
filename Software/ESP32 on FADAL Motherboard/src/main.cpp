@@ -1,9 +1,7 @@
 /*################ Libraries ################*/
   #include <Arduino.h>
   #include <ModbusRTU.h> // https://github.com/emelianov/modbus-esp8266
-  #include <OneWire.h> 
-  #include <DallasTemperature.h>
-
+  
 /*################ ESP32 Pin asignement ################*/
   //--- Outputs ----//
     #define MK2_6_pin 13
@@ -26,13 +24,26 @@
 /*################ Constant ################*/
   #define SLAVE_ID 2 // Used for modbus
 
+/*################ Features switches ################*/  
+  //#define Temperature_sensor_features_ON
+  //#define Debug_ON
+  //#define Multicore_ON
+
+/*################ Multicore stuff ################*/
+  #ifdef Multicore_ON
+    TaskHandle_t Task1;
+    TaskHandle_t Task2;
+  #endif
+
 /*################ Object Initialisation ################*/
   ModbusRTU mb; // Modbus Initialisation //
-  OneWire oneWire(Temperatur_sensors_pin);
-  DallasTemperature sensors(&oneWire);
 
+  #ifdef Temperature_sensor_features_ON
+    #include <DallasTemperature.h>
+    OneWire oneWire(Temperatur_sensors_pin);
+    DallasTemperature sensors(&oneWire);
+  #endif
 /*################ Variables ################*/
-  bool Debuging_Mode = false;
   float Current_Temp_air;
   float Current_Temp_chiller;
   unsigned long currentMillis;
@@ -47,67 +58,105 @@
       mb.Hreg(150, Current_Charge_pump_value);
     }
   //------------------- Debug -------------------//
-    void Debug(){
-      unsigned long currentMillis = millis();
-      if (currentMillis - previousMillis >= 250) {
-        previousMillis = currentMillis;
-        Serial.printf("Air temperature = %d Chiller temperature = %d Charge Pump = %i \n", Current_Temp_air, Current_Temp_chiller, Current_Charge_pump_value);
+    #ifdef Debug_ON
+      void Debug(){
+        unsigned long currentMillis = millis();
+        if (currentMillis - previousMillis >= 250) {
+          previousMillis = currentMillis;
+          Serial.printf("Air temperature = %d Chiller temperature = %d Charge Pump = %i \n", Current_Temp_air, Current_Temp_chiller, Current_Charge_pump_value);
+        }
       }
-    }
+    #endif
 
-void setup() {
-  // Pin Modes //
-    pinMode(MK2_6_pin, OUTPUT);
-    pinMode(MK2_7_pin, OUTPUT);
-    pinMode(MK2_8_pin, OUTPUT);
-    pinMode(MK2_9_pin, OUTPUT);
-    pinMode(MK2_10_pin, OUTPUT);
-    pinMode(MK2_11_pin, OUTPUT);
-    pinMode(MK2_12_pin, OUTPUT);
 
-    pinMode(Charge_pump_pin, INPUT);
-    pinMode(Temperatur_sensors_pin, INPUT);
 
-    digitalWrite(MK2_6_pin,LOW);
-    digitalWrite(MK2_7_pin,LOW);
-    digitalWrite(MK2_8_pin,LOW);
-    digitalWrite(MK2_9_pin,LOW);
-    digitalWrite(MK2_10_pin,LOW);
-    digitalWrite(MK2_11_pin,LOW);
-    digitalWrite(MK2_12_pin,LOW);
+/*################ Setup ################*/
+  void setup() {
 
-  // Temperature sensor //
-    Serial.begin(115200);
-    sensors.begin();
+      #ifdef Multicore_ON
+        xTaskCreatePinnedToCore(
+          Task1code,   /* Task function. */
+          "Task1",     /* name of task. */
+          10000,       /* Stack size of task */
+          NULL,        /* parameter of the task */
+          1,           /* priority of the task */
+          &Task1,      /* Task handle to keep track of created task */
+          0);          /* pin task to core 0 */      
 
-  // Modbus stuf //
-    Serial1.begin(115200, SERIAL_8N1, RS485_RX_pin, RS485_TX_pin);
-    mb.begin(&Serial1, RS485_RE_DE_pin);
-    mb.slave(SLAVE_ID);
+        xTaskCreatePinnedToCore(
+          Task2code,   /* Task function. */
+          "Task2",     /* name of task. */
+          10000,       /* Stack size of task */
+          NULL,        /* parameter of the task */
+          1,           /* priority of the task */
+          &Task2,      /* Task handle to keep track of created task */
+          1);
+      #endif
 
-  /*################ From Master to slave ################*/
-      mb.addHreg(100);
+    // Pin Modes //
+      pinMode(MK2_6_pin, OUTPUT);
+      pinMode(MK2_7_pin, OUTPUT);
+      pinMode(MK2_8_pin, OUTPUT);
+      pinMode(MK2_9_pin, OUTPUT);
+      pinMode(MK2_10_pin, OUTPUT);
+      pinMode(MK2_11_pin, OUTPUT);
+      pinMode(MK2_12_pin, OUTPUT);
 
-  /*################ From slave to master ################*/
-      mb.addHreg(150);
+      pinMode(Charge_pump_pin, INPUT);
+      pinMode(Temperatur_sensors_pin, INPUT);
 
-      hreg100 = mb.Hreg(100);
-}
+      digitalWrite(MK2_6_pin,LOW);
+      digitalWrite(MK2_7_pin,LOW);
+      digitalWrite(MK2_8_pin,LOW);
+      digitalWrite(MK2_9_pin,LOW);
+      digitalWrite(MK2_10_pin,LOW);
+      digitalWrite(MK2_11_pin,LOW);
+      digitalWrite(MK2_12_pin,LOW);
 
-void loop() {
-  // Get current temperature
-    sensors.requestTemperatures();
-    Current_Temp_air = sensors.getTempCByIndex(0); //Ambiant air
-    Current_Temp_chiller = sensors.getTempCByIndex(1); // Chiller
-    
-  // Update Mudbus
-    mb.task();
-    yield();
+    // Temperature sensor //
+      //Serial.begin(115200);
+      #ifdef Temperature_sensor_features_ON
+        sensors.begin();
+      #endif
 
-  // Call functions
-    Charge_pump();
-    if (Debuging_Mode){ Debug(); }
+    // Debug
+      #ifdef Debug_ON
+        Serial.begin(115200);
+      #endif
 
-  // One milisecond delay for smoot operation
-    delay(1);
-}
+    // Modbus stuf //
+      Serial1.begin(115200, SERIAL_8N1, RS485_RX_pin, RS485_TX_pin);
+      mb.begin(&Serial1, RS485_RE_DE_pin);
+      mb.slave(SLAVE_ID);
+
+    /*################ From Master to slave ################*/
+        mb.addHreg(100);
+
+    /*################ From slave to master ################*/
+        mb.addHreg(150);
+
+        hreg100 = mb.Hreg(100);
+  }
+
+/*################ Loop ################*/
+  void loop() {
+    // Get current temperature
+      #ifdef Temperature_sensor_features_ON
+        sensors.requestTemperatures();
+        Current_Temp_air = sensors.getTempCByIndex(0); //Ambiant air
+        Current_Temp_chiller = sensors.getTempCByIndex(1); // Chiller
+      #endif
+
+    // Update Mudbus
+      mb.task();
+      yield();
+
+    // Call functions
+      Charge_pump();
+      #ifdef Debug_ON
+        Debug();
+      #endif
+
+    // One milisecond delay for smoot operation
+      delay(1);
+  }
