@@ -115,7 +115,7 @@
           digitalWrite(single_line_LED,LOW);
         }
 
-        if(mb.Hreg(9) == 1){ // Lights ON/OFF LED
+        if(mb.Hreg(10) == 1){ // Lights ON/OFF LED
           digitalWrite(light_LED,HIGH);
         }else{
           digitalWrite(light_LED,LOW);
