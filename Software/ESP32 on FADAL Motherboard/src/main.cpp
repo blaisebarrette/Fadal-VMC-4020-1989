@@ -25,9 +25,9 @@
   #define SLAVE_ID 2 // Used for modbus
 
 /*################ Features switches ################*/  
-  //#define Temperature_sensor_features_ON
+  #define Temperature_sensor_features_ON
   //#define Debug_ON
-  //#define Multicore_ON
+  #define Multicore_ON
 
 /*################ Multicore stuff ################*/
   #ifdef Multicore_ON
@@ -68,18 +68,103 @@
       }
     #endif
 
+/*################ Tasks specific to core 0 ################*/
+  #ifdef Multicore_ON
+    void Task1code( void * pvParameters ){
+      //--- Setup Section Start ----//
+        pinMode(Temperatur_sensors_pin, INPUT);
+        // Temperature sensor //
+        Serial.begin(115200);
+        #ifdef Temperature_sensor_features_ON
+          sensors.begin();
+        #endif
+      //--- Setup Section End ----//
+      
+      while (true) {
+        //--- Loop Section Start ----//
+          // Get current temperature
+          #ifdef Temperature_sensor_features_ON
+            sensors.requestTemperatures();
+            Current_Temp_air = sensors.getTempCByIndex(0); //Ambiant air
+            Current_Temp_chiller = sensors.getTempCByIndex(1); // Chiller
+          #endif
+        //--- Loop Section End ----//
+      }
+    }
+  #endif
 
+/*################ Tasks specific to core 1 ################*/
+  #ifdef Multicore_ON
+    void Task2code( void * pvParameters ){
+      //--- Setup Section Start ----//
+        // Pin Modes //
+          pinMode(MK2_6_pin, OUTPUT);
+          pinMode(MK2_7_pin, OUTPUT);
+          pinMode(MK2_8_pin, OUTPUT);
+          pinMode(MK2_9_pin, OUTPUT);
+          pinMode(MK2_10_pin, OUTPUT);
+          pinMode(MK2_11_pin, OUTPUT);
+          pinMode(MK2_12_pin, OUTPUT);
+
+          digitalWrite(MK2_6_pin,LOW);
+          digitalWrite(MK2_7_pin,LOW);
+          digitalWrite(MK2_8_pin,LOW);
+          digitalWrite(MK2_9_pin,LOW);
+          digitalWrite(MK2_10_pin,LOW);
+          digitalWrite(MK2_11_pin,LOW);
+          digitalWrite(MK2_12_pin,LOW);
+
+          pinMode(Charge_pump_pin, INPUT);
+
+        // Modbus stuf //
+          Serial1.begin(115200, SERIAL_8N1, RS485_RX_pin, RS485_TX_pin);
+          mb.begin(&Serial1, RS485_RE_DE_pin);
+          mb.slave(SLAVE_ID);
+
+        // Debug
+          #ifdef Debug_ON || Temperature_sensor_features_ON
+            Serial.begin(115200);
+          #endif
+
+          /*################ From Master to slave ################*/
+              mb.addHreg(100);
+
+          /*################ From slave to master ################*/
+              mb.addHreg(150);
+              hreg100 = mb.Hreg(100);
+
+      //--- Setup Section End ----//
+      
+      while (true) {
+        //--- Loop Section Start ----//
+          // Update Mudbus
+            mb.task();
+            yield();
+
+          // Call functions
+            Charge_pump();
+            #ifdef Debug_ON
+              Debug();
+            #endif
+
+          // One milisecond delay for smoot operation
+            delay(1);
+        //--- Loop Section End ----//
+      }
+    }
+  #endif
 
 /*################ Setup ################*/
   void setup() {
-
+    btStop();
+    // Multicore specific code //
       #ifdef Multicore_ON
         xTaskCreatePinnedToCore(
           Task1code,   /* Task function. */
           "Task1",     /* name of task. */
           10000,       /* Stack size of task */
           NULL,        /* parameter of the task */
-          1,           /* priority of the task */
+          0,           /* priority of the task */
           &Task1,      /* Task handle to keep track of created task */
           0);          /* pin task to core 0 */      
 
@@ -92,71 +177,9 @@
           &Task2,      /* Task handle to keep track of created task */
           1);
       #endif
-
-    // Pin Modes //
-      pinMode(MK2_6_pin, OUTPUT);
-      pinMode(MK2_7_pin, OUTPUT);
-      pinMode(MK2_8_pin, OUTPUT);
-      pinMode(MK2_9_pin, OUTPUT);
-      pinMode(MK2_10_pin, OUTPUT);
-      pinMode(MK2_11_pin, OUTPUT);
-      pinMode(MK2_12_pin, OUTPUT);
-
-      pinMode(Charge_pump_pin, INPUT);
-      pinMode(Temperatur_sensors_pin, INPUT);
-
-      digitalWrite(MK2_6_pin,LOW);
-      digitalWrite(MK2_7_pin,LOW);
-      digitalWrite(MK2_8_pin,LOW);
-      digitalWrite(MK2_9_pin,LOW);
-      digitalWrite(MK2_10_pin,LOW);
-      digitalWrite(MK2_11_pin,LOW);
-      digitalWrite(MK2_12_pin,LOW);
-
-    // Temperature sensor //
-      //Serial.begin(115200);
-      #ifdef Temperature_sensor_features_ON
-        sensors.begin();
-      #endif
-
-    // Debug
-      #ifdef Debug_ON
-        Serial.begin(115200);
-      #endif
-
-    // Modbus stuf //
-      Serial1.begin(115200, SERIAL_8N1, RS485_RX_pin, RS485_TX_pin);
-      mb.begin(&Serial1, RS485_RE_DE_pin);
-      mb.slave(SLAVE_ID);
-
-    /*################ From Master to slave ################*/
-        mb.addHreg(100);
-
-    /*################ From slave to master ################*/
-        mb.addHreg(150);
-
-        hreg100 = mb.Hreg(100);
   }
 
 /*################ Loop ################*/
   void loop() {
-    // Get current temperature
-      #ifdef Temperature_sensor_features_ON
-        sensors.requestTemperatures();
-        Current_Temp_air = sensors.getTempCByIndex(0); //Ambiant air
-        Current_Temp_chiller = sensors.getTempCByIndex(1); // Chiller
-      #endif
 
-    // Update Mudbus
-      mb.task();
-      yield();
-
-    // Call functions
-      Charge_pump();
-      #ifdef Debug_ON
-        Debug();
-      #endif
-
-    // One milisecond delay for smoot operation
-      delay(1);
   }
