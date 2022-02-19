@@ -1,0 +1,51 @@
+//This is the destructor macro which executes once, on the application close event
+
+// Tell ESP32 on motherboard to turn all the relays off
+    exec.SetModbusregister(100, 0);
+    exec.SetModbusregister(101, 0);
+    exec.SetModbusregister(102, 0);
+    exec.SetModbusregister(103, 0);
+    exec.SetModbusregister(104, 0);
+    exec.SetModbusregister(105, 0);
+
+// Tell ESP32 on Control to turn all the LEDs off
+    exec.SetModbusregister(0, 0); // Probe Tool LED
+    exec.SetModbusregister(1, 0); // Table Front LED
+    exec.SetModbusregister(2, 0); // Home Machine LED
+    exec.SetModbusregister(3, 0); // Reset LED
+    exec.SetModbusregister(4, 0); // Spindle ON/OFF LED
+    exec.SetModbusregister(5, 0); // Coolant ON/OFF LED
+    exec.SetModbusregister(6, 0); // Mist ON/OFF LED
+    exec.SetModbusregister(7, 0); // Chip Auger ON/OFF LED
+    exec.SetModbusregister(8, 0); // Optional Stop LED
+    exec.SetModbusregister(9, 0); // Single Line LED
+    exec.SetModbusregister(10, 0); // Lights ON/OFF LED
+
+
+// turn all relays controled by the UC300 ETH 5LPT off
+    exec.Clroutpin(1, 1); // Chiller And Chiller liquid pump
+    exec.Clroutpin(1, 14); // Tool changer lateral motor
+    exec.Clroutpin(1, 16); // Tool changer radial motor CW
+    exec.Clroutpin(1, 17); // Tool changer radial motor CCW
+    exec.Clroutpin(2, 1); // Unused
+    exec.Clroutpin(2, 2); // Unused
+    exec.Clroutpin(2, 3); // Chip auger motor CW
+    exec.Clroutpin(2, 4); // External controlled outlet 2
+    exec.Clroutpin(2, 5); // Lights
+    exec.Clroutpin(2, 6); // Skimmer motor
+    exec.Clroutpin(2, 7); // Skimmer smal pump
+    exec.Clroutpin(2, 8); // Way lube pump
+    exec.Clroutpin(2, 9); // Coolant pump
+    exec.Clroutpin(2, 14); // Unused
+    exec.Clroutpin(2, 16); // Chip auger motor CW
+    exec.Clroutpin(2, 17); // External controlled outlet 1
+    exec.Clroutpin(3, 16); // Spindle orientation solenoid valve
+    exec.Clroutpin(4, 1); // Coolant air flush solenoid valve
+    exec.Clroutpin(4, 14); // Spindle belt tensioner FAST solenoid valve
+    exec.Clroutpin(4, 16); // Spindle belt tensioner SLOW solenoid valve
+    exec.Clroutpin(4, 17); // Draw bar solenoid valve
+    exec.Clroutpin(5, 1); // Automatic door open
+    exec.Clroutpin(5, 14); // Automatic door close
+    exec.Clroutpin(5, 16); // Coolant curtain solenoid valve
+    exec.Clroutpin(5, 17); // Spindle lube solenoid valve
+

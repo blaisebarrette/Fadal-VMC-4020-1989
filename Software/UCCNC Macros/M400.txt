@@ -1,0 +1,65 @@
+//float PreviousSpindleSpeed = float.Parse(AS3.Getfield(869));
+//float CurrentSpindleSpeed;
+
+//while(loop){
+    // This will check for sufficient air presure and put the machine in reset if not.
+    float AirPressure = 65000; // float.Parse(AS3.Getfield(911)); // Analog out 1 (Air pressure)
+    float AirPressureMinimum = 30000;
+    if(AirPressure < AirPressureMinimum){
+        MessageBox.Show("Air pressure is to low to maintain machine minimum requirments"); // Send Message "Air pressure to low"
+        exec.Callbutton(130); // Stop the machine
+        exec.Callbutton(512); // Trigger Reset
+        return;
+    }
+
+    // Testing for making a timer
+    if(exec.IsMoving() && !AS3.GetLED(217)){
+        AS3.Setfield(111,3000);
+    }else{
+        AS3.Setfield(000,3000);
+    }
+
+    // Changes the Cycle start button to a Cycle Hold button while moving
+    if(!AS3.GetLED(111)){ // If the phisical Cycle button on the control is pressed
+        if(!exec.IsMoving()){
+            exec.Callbutton(128); // Call Cycle start
+        }else{
+            exec.Callbutton(522); // Call stop
+        }
+        exec.Wait(500);
+    }
+
+    //Keep the waylube pump running when the axis are in movement
+    if(exec.IsMoving()){
+        exec.Setoutpin(2,8);
+    }else{
+        exec.Clroutpin(2,8);
+    }
+
+    // This IF statement control the state of the jog scale buttons
+    if((AS3jog.Getbuttonstate(241) == true) || (AS3jog.Getbuttonstate(164) == true) || (AS3jog.Getbuttonstate(165) == true)){
+        AS3jog.Switchbutton(false, 20000);
+    }
+
+    // If reset is made active
+    if(AS3.GetLED(25) == true){ 
+        exec.Clroutpin(2,3); // Turne CHip Auger motor CW off
+        exec.Clroutpin(2,16); // Turne CHip Auger motor CCW off
+    }
+
+    // If kill switch is pressed
+    if(!AS3.GetLED(95)){ 
+        exec.Setoutpin(3,9); // Trigger drives error line
+        exec.Callbutton(781); // Clear any Homing reference
+    }else{
+        exec.Clroutpin(3,9); // Release drive error line and reset the drives
+    }
+
+    //CurrentSpindleSpeed = float.Parse(AS3.Getfield(869));
+    //if(CurrentSpindleSpeed != PreviousSpindleSpeed && AS3.Getbuttonstate(114) || AS3.Getbuttonstate(115)){
+        //PreviousSpindleSpeed = CurrentSpindleSpeed;
+        //MessageBox.Show("debug");
+    //}
+
+    //Thread.Sleep(50);
+//}

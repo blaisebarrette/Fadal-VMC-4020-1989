@@ -4,8 +4,6 @@ bool HighGearProximitySwitch = true; // AS3.GetLED(11); // Port 1 pin 11
 float AirPressure = 65000; // float.Parse(AS3.Getfield(911)); // Analog out 1 (Air pressure)
 float AirPressureMinimum = 30000;
 
-//107, 108, 109
-
 if(AirPressure < AirPressureMinimum){
     MessageBox.Show("Air pressure is to low to maintain machine minimum requirments"); // Send Message "Air pressure to low"
     exec.Callbutton(130); // Stop the machine
@@ -33,7 +31,7 @@ if(SpindleSpeed < 2500){
 		MessageBox.Show("The machine needs to be homed before you can start the spindle");
 		return;
 	}
-    exec.DospinCW(); // Start spindle
+    exec.DospinCCW(); // Start spindle
 	exec.Setoutpin(5, 17); // Activate Spindle lube relay
 }
 
@@ -57,8 +55,8 @@ if(SpindleSpeed >= 2500 && SpindleSpeed <= 10000){
 		MessageBox.Show("The machine needs to be homed before you can start the spindle");
 		return;
 	}
-    exec.DospinCW(); // Start spindle
-	exec.Setoutpin(5, 17); // Activate Spindle lube relay 
+    exec.DospinCCW(); // Start spindle
+	exec.Setoutpin(5, 17); // Activate Spindle lube relay
 }
 
 if(SpindleSpeed > 10000){

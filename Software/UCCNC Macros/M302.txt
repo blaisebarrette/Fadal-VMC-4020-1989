@@ -1,0 +1,26 @@
+/********************************************/
+/*          Get modus from slave 2          */
+/*           ESP32 in motherboard           */
+/********************************************/
+    ushort tempval = 0;
+    exec.GetModbusregister(150, out tempval);
+
+/********************************************/
+/*           Send modus to slave 2          */
+/*           ESP32 in motherboard           */
+/********************************************/
+    if(AS3.Getbuttonstate(116) == true){ // See if mist button is activated and let know the motherboard ESP32 the mist state so that it can set the mist relay acordingly.
+        exec.SetModbusregister(100, 1);
+    }else{
+        exec.SetModbusregister(100, 0);
+    }
+    
+    exec.SetModbusregister(101, 2);
+    exec.SetModbusregister(102, 3);
+    exec.SetModbusregister(103, 4);
+    exec.SetModbusregister(104, 5);
+    exec.SetModbusregister(105, 6);
+    exec.SetModbusregister(106, 7);
+    exec.SetModbusregister(107, 8);
+    exec.SetModbusregister(108, 9);
+    exec.SetModbusregister(109, 10);

@@ -1,0 +1,4 @@
+//This is the Constructor macro which executes once when the application gets loaded
+
+//AS3.Switchbutton(false, 561);
+//exec.SetModbusregister(8, 0);

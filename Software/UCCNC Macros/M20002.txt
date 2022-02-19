@@ -1,0 +1,20 @@
+// This macro tuggles the chip auger on or off
+// M20002 P0 turns chip auger off
+// M20002 P1 turns chip auger on
+
+if(AS3.GetLED(71)){ // Looks in diagnostics if LED for port 2 pin 3 (chip auger Relay) 
+    exec.Clroutpin(2,3);
+}else{
+    exec.Setoutpin(2,3);
+}
+
+if(Allvars != null){  // Test if P variable was entered when the M20001 was called
+    if (Allvars.Pvar != null){
+        if(Allvars.Pvar == 0){ // M20001 P0 turns chip auger off
+            exec.Clroutpin(2,3);
+        }
+        if(Allvars.Pvar == 1){ // M20001 P1 turns chip auger on
+            exec.Setoutpin(2,3);
+        }
+    }
+}
