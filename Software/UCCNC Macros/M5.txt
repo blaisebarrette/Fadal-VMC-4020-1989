@@ -1,0 +1,5 @@
+﻿exec.Stopspin(); // Turn off spindle
+exec.Clroutpin(5, 17); // Deactivate Spindle lube relay
+exec.Wait(5000);
+exec.Clroutpin(4, 16); // Deactivate Belt tensioner SLOW solenoid valve
+exec.Clroutpin(4, 14); // Deactivate Belt tensioner Fast solenoid valve

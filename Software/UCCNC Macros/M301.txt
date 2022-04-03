@@ -1,11 +1,6 @@
 /********************************************/
-/*    Persistent variables declared here    */
-/********************************************/
-
-
-    //while(loop) {
-/********************************************/
-/*          Get modus from slaves           */
+/*          Get modus from slave 1          */
+/*          ESP32 in control panel          */
 /********************************************/
     ushort[] Slave_Master_array = new ushort[9];
     exec.GetModbusregisters(50, 9, out Slave_Master_array);
@@ -20,7 +15,8 @@
     ushort _ActivateToolChange = Slave_Master_array[8]; // 58
 
 /********************************************/
-/*           Send modus to slaves           */
+/*           Send modus to slave 1          */
+/*          ESP32 in control panel          */
 /********************************************/
     //---- LED ----//
         // Probe Tool LED
@@ -39,6 +35,7 @@
         // Reset LED
         if(AS3.GetLED(25) == true){ 
             exec.SetModbusregister(3, 1);
+            
         }else{
             exec.SetModbusregister(3, 0);
         }
@@ -65,7 +62,11 @@
         }
 
         // Chip Auger ON/OFF LED
-        exec.SetModbusregister(7, 0);
+        if(AS3.GetLED(71) == true){
+            exec.SetModbusregister(7, 1);
+        }else{
+            exec.SetModbusregister(7, 0);
+        }
         
         // Optional Stop LED
         if(AS3.Getbuttonstate(561) == true){
@@ -82,7 +83,12 @@
         }
 
         // Lights ON/OFF LED
-        exec.SetModbusregister(10, 0);
+        if(AS3.GetLED(73) == true){
+            exec.SetModbusregister(10, 1);
+        }else{
+            exec.SetModbusregister(10, 0);
+        }
+        
         
 
     //---- MPG state ----//
@@ -133,11 +139,12 @@
         string S_CurrentPulley = AS3.Getfield(2013);
         ushort CurrentPulley = Convert.ToUInt16(S_CurrentPulley);
         exec.SetModbusregister(16, CurrentPulley);
-        float SSO_Overiden = float.Parse(AS3.Getfield(2451));
+        float SpindleDemmandedSpeed = float.Parse(AS3.Getfield(869));
+        exec.SetModbusregister(17, Convert.ToUInt16(SpindleDemmandedSpeed));
         bool SSOalteredFromUCCNC = false;
 
         if(AS3.Getbutton(134) || AS3.Getbutton(135) || AS3.Getbutton(558)){
-            if((CurrentPulley == 1 && SSO_Overiden < 2500) || (CurrentPulley == 2 && SSO_Overiden > 2500)){
+            if((CurrentPulley == 1 && SpindleDemmandedSpeed < 2500) || (CurrentPulley == 2 && (SpindleDemmandedSpeed > 2500))){
                 exec.SetModbusregister(14, SpindleSpeedOverideInUCCNCField);
                 SSOalteredFromUCCNC = true;
                 ushort SSOWaitForUpdate = 0;
@@ -184,6 +191,23 @@
             if(_MPG_Multiplication == 4){exec.Callbutton(165);}
         }
     
+    //---- Set Jog settings to "MPG MULTI" on jog weel activity ----//
         if((AS3jog.Getbuttonstate(241) == true) || (AS3jog.Getbuttonstate(164) == true) || (AS3jog.Getbuttonstate(165) == true)){AS3jog.Switchbutton(false, 20000);}
-    //Thread.Sleep(50);
-//}
+
+    //---- Actions on spindle buttons activity ----//
+        /*if(AS3.Getbutton(114)){
+            exec.Wait(100);
+            if(AS3.GetLED(50)){
+                exec.Code("M3");
+            }else{
+                exec.Code("M5");
+            }
+        }
+        if(AS3.Getbutton(115)){
+            exec.Wait(100);
+            if(AS3.GetLED(51)){
+                exec.Code("M4");
+            }else{
+                exec.Code("M5");
+            }
+        }*/

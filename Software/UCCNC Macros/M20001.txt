@@ -1,0 +1,20 @@
+// This macro tuggles the lights on or off
+// M20001 P0 turns light off
+// M20001 P1 turns light on
+
+if(AS3.GetLED(73)){ // Looks in diagnostics if LED for port 2 pin 16 (Light Relay) 
+    exec.Clroutpin(2,5);
+}else{
+    exec.Setoutpin(2,5);
+}
+
+if(Allvars != null){  // Test if P variable was entered when the M20001 was called
+    if (Allvars.Pvar != null){
+        if(Allvars.Pvar == 0){ // M20001 P0 turns light off
+            exec.Clroutpin(2,5);
+        }
+        if(Allvars.Pvar == 1){ // M20001 P1 turns light on
+            exec.Setoutpin(2,5);
+        }
+    }
+}
