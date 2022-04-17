@@ -12,19 +12,14 @@
         return;
     }
 
-    // Testing for making a timer
-    if(exec.IsMoving() && !AS3.GetLED(217)){
-        AS3.Setfield(111,3000);
-    }else{
-        AS3.Setfield(000,3000);
-    }
-
     // Changes the Cycle start button to a Cycle Hold button while moving
     if(!AS3.GetLED(111)){ // If the phisical Cycle button on the control is pressed
         if(!exec.IsMoving()){
-            exec.Callbutton(128); // Call Cycle start
+            exec.Callbutton(218); // Reset the Cycle Time field
+            exec.Callbutton(128); // Call "Cycle start"
+
         }else{
-            exec.Callbutton(522); // Call stop
+            exec.Callbutton(522); // Call "Feed hold"
         }
         exec.Wait(500);
     }

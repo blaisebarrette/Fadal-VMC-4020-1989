@@ -14,20 +14,20 @@
     #define mist_LED 1
     #define chip_auger_LED 15
     #define optional_stop_LED 23
-    #define single_line_LED 36
+    #define single_line_LED 13
     #define light_LED 22
   //--- Inputs ----//
-    #define scale_select 13
-    #define axis_select 12
-    #define feed_override_A 27
-    #define feed_override_B 14
-    #define feed_override_switch 26
-    #define spindle_override_A 33
-    #define spindle_override_B 25
-    #define spindle_override_switch 32
-    #define tool_select_A 34
-    #define tool_select_B 35
-    #define tool_select_switch 39
+    #define scale_select 39
+    #define axis_select 36
+    #define feed_override_A 14
+    #define feed_override_B 12
+    #define feed_override_switch 32
+    #define spindle_override_A 26
+    #define spindle_override_B 27
+    #define spindle_override_switch 35
+    #define tool_select_A 33
+    #define tool_select_B 25
+    #define tool_select_switch 34
   //--- RS485 ----//
     #define RS485_TX 17
     #define RS485_RX 16
