@@ -11,6 +11,9 @@
     #define MK2_10_pin 26 // Unused
     #define MK2_11_pin 25 // Unused
     #define MK2_12_pin 33 // Charge pump
+    #define Red_status_light 18 // Controls The Red status light (Not programmed yet)
+    #define Green_status_light 19 // Controls The Green status light (Not programmed yet)
+    #define Drive_error_state 32 // Controls the error state of the drives (Not programmed yet)
 
   //--- Inputs ----//
     #define Charge_pump_pin 2
@@ -242,7 +245,6 @@
 
 /*################ Setup ################*/
   void setup() {
-    
     //create a task that will be executed in the Task2code() function, with priority 1 and executed on core 1
       xTaskCreatePinnedToCore(
                         Core_2_code,   // Task function. //
@@ -271,6 +273,9 @@
         pinMode(MK2_10_pin, OUTPUT);
         pinMode(MK2_11_pin, OUTPUT);
         pinMode(MK2_12_pin, OUTPUT);
+        pinMode(Red_status_light, OUTPUT);
+        pinMode(Green_status_light, OUTPUT);
+        pinMode(Drive_error_state, OUTPUT);
 
         digitalWrite(MK2_6_pin,LOW);
         digitalWrite(MK2_7_pin,LOW);
@@ -279,6 +284,9 @@
         digitalWrite(MK2_10_pin,LOW);
         digitalWrite(MK2_11_pin,LOW);
         digitalWrite(MK2_12_pin,LOW);
+        digitalWrite(Red_status_light,LOW);
+        digitalWrite(Green_status_light,LOW);
+        digitalWrite(Drive_error_state,LOW);
 
     // Modbus stuff //
       Serial1.begin(115200, SERIAL_8N1, RS485_RX_pin, RS485_TX_pin);
