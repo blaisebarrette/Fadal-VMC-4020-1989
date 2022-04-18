@@ -19,14 +19,14 @@
   //--- Inputs ----//
     #define scale_select 39
     #define axis_select 36
-    #define feed_override_A 14
-    #define feed_override_B 12
+    #define feed_override_A 12
+    #define feed_override_B 14
     #define feed_override_switch 32
-    #define spindle_override_A 26
-    #define spindle_override_B 27
+    #define spindle_override_A 27
+    #define spindle_override_B 26
     #define spindle_override_switch 35
-    #define tool_select_A 33
-    #define tool_select_B 25
+    #define tool_select_A 25
+    #define tool_select_B 33
     #define tool_select_switch 34
   //--- RS485 ----//
     #define RS485_TX 17
@@ -35,6 +35,9 @@
 
 /*################ Constant ################*/
   #define SLAVE_ID 1 // Used for modbus
+
+/*################ Features switches ################*/  
+  //#define Debug_on
 
 /*################ Object Initialisation ################*/
   ModbusRTU mb; // Modbus Initialisation //
@@ -47,7 +50,6 @@
   unsigned long currentMillis;
   unsigned long previousMillis = 0;
   bool isMoving = false;
-  bool Debuging_Mode = false;
   int ToolSelectValue = 1;
   int SpindleSpeedOverrideValue = 100;
   int FeedOverrideValue = 100;
@@ -160,12 +162,12 @@
       }*/
 
       void SpindleSpeedOverRide(){
-        int pulleyRatio = mb.Hreg(16); 
+        /*int pulleyRatio = mb.Hreg(16); 
         if(PreviousPulley != pulleyRatio){
           PreviousPulley = pulleyRatio;
           SpindleSpeedOverrideValue = 100;
           mb.Hreg(55, SpindleSpeedOverrideValue);
-        }
+        }*/
         
         if (encoder2.getCountRaw() != E2prev){
           if (encoder2.getCountRaw() < E2prev){
@@ -186,8 +188,8 @@
           mb.Hreg(55, SpindleSpeedOverrideValue);
         }
         if (digitalRead(spindle_override_switch) == LOW){
-          SpindleSpeedOverrideValue = 100;
-          mb.Hreg(55, SpindleSpeedOverrideValue);
+          //SpindleSpeedOverrideValue = 100;
+          //mb.Hreg(55, SpindleSpeedOverrideValue);
         }
 
         // Look for a change fromm UCCNC
@@ -269,13 +271,15 @@
       }
 
     //------------------- Debug -------------------//
-      void Debug(){
-        unsigned long currentMillis = millis();
-        if (currentMillis - previousMillis >= 250) {
-          previousMillis = currentMillis;
-          Serial.printf("E1prev = %d E2prev = %d MPG_Axis_Select_val =  %d MPG_Multiplicaton = %d \n", E1prev, E2prev, MPG_Axis_Select_val, MPG_Multiplicaton);
+      #ifdef Debug_on
+        void Debug(){
+          unsigned long currentMillis = millis();
+          if (currentMillis - previousMillis >= 250) {
+            previousMillis = currentMillis;
+            Serial.printf("ToolSelectValue = %d SpindleSpeedOverrideValue = %d FeedOverrideValue = %d MPG_Axis_Select_val =  %d MPG_Multiplicaton = %d \n", ToolSelectValue, SpindleSpeedOverrideValue, FeedOverrideValue, MPG_Axis_Select_val, MPG_Multiplicaton);
+          }
         }
-      }
+      #endif
 
 /*################ Setup and loop ################*/
   void setup() {
@@ -350,11 +354,11 @@
       mb.Hreg(55, 100); // initially set the value to 100% on modbus
       mb.Hreg(57, 100); // initially set the value to 100% on modbus
 
-    // Serial debug. Runs only if variable "Debuging_Mode" is set to true //
-      if (Debuging_Mode) {
+    // Serial debug. Runs only if uncomentend in the "Feature switch" section
+      #ifdef Debug_on
         Serial.begin(115200);
         Serial.println("Debug mode activated!");
-      }
+      #endif
   }
 
   void loop() {
@@ -363,7 +367,9 @@
       SpindleSpeedOverRide();
       FeedOverRide();
       MPG_control_Select();
-      if (Debuging_Mode){ Debug(); }
+      #ifdef Debug_on
+        Debug();
+      #endif
       if(mb.Hreg(18) == 1){isMoving = true;}else{isMoving = false;}
       mb.task();
       yield();
